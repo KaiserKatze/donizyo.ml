@@ -14,8 +14,8 @@ ARG         PCRE_PREFIX=/usr/local/pcre
 ARG         ZLIB_PREFIX=/usr/local/zlib
 
 #
-RUN         apt-get update -q && \
-            apt-get install -yq --no-install-recommends build-essential curl tar git
+RUN         apt-get -qq update > /dev/null && \
+            apt-get -qq -y install build-essential curl tar git > /dev/null
 
 RUN         rm -rf "$PATH_APP" "$OPENSSL_PREFIX" "$OPENSSL_DIR" "$PCRE_PREFIX" "$ZLIB_PREFIX" && \
             mkdir -p "$PATH_APP"
