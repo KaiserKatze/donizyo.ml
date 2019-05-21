@@ -1,0 +1,6 @@
+services:
+  - docker
+
+script:
+  - sudo docker build -t nginx:1.16.0 .
+  - docker images
