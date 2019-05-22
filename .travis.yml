@@ -3,7 +3,11 @@ services:
 
 script:
   - docker build -t nginx:1.16.0 nginx
+  - docker build -t python:3.7.3 python
   - docker images
+
+test:
+  - docker run -d python:3.7.3 "python -V && python -c 'import ssl' && python -c 'import sqlite3'"
 
 sudo: required
 
