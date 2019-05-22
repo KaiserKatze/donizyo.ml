@@ -3,13 +3,13 @@ services:
 
 script:
   - docker build -t openssl:1.1.1b openssl
-  - docker build -t nginx:1.16.0 nginx
-  - #docker build -t python:3.7.3 python
+  - #docker build -t nginx:1.16.0 nginx
+  - docker build -t python:3.7.3 python
   - docker images
 
 test:
-  - docker run -d nginx:1.16.0 -p 80:80/tcp -p 443:443/tcp -p 1935:1935/tcp "nginx -t"
-  - #docker run -d python:3.7.3 "python -V && python -c 'import ssl' && python -c 'import sqlite3'"
+  - #docker run -d nginx:1.16.0 -p 80:80/tcp -p 443:443/tcp -p 1935:1935/tcp "nginx -t"
+  - docker run -d python:3.7.3 "python -V && python -c 'import ssl' && python -c 'import sqlite3'"
 
 sudo: required
 

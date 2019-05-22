@@ -31,7 +31,9 @@ RUN         cd "$PATH_APP" && \
                 --enable-profiling \
                 --enable-optimizations \
                 --with-lto \
-                --with-ssl-default-suites=python \
+                --with-ssl-default-suites=python && \
+            make && \
+            make install && \
             cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
             update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 1 && \
             python -m pip --upgrade pip
