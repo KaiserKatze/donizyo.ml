@@ -13,12 +13,11 @@ EXPOSE      443/tcp
 # RTMP
 EXPOSE      1935/tcp
 
-ARG         PATH_APP=/root/App
 ARG         URL_PCRE_TARBALL=https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
 ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
-ARG         PCRE_PREFIX=/usr/local/pcre
-ARG         ZLIB_PREFIX=/usr/local/zlib
+ENV         PCRE_PREFIX=/usr/local/pcre
+ENV         ZLIB_PREFIX=/usr/local/zlib
 
 # pcre
 RUN         cd "$PATH_APP" && \

@@ -5,10 +5,10 @@ LABEL       maintainer.name="KaiserKatze" \
             maintainer.mail="donizyo@gmail.com"
 WORKDIR     /tmp/workdir
 
-ARG         PATH_APP=/root/App
+ENV         PATH_APP=/root/App
 ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
-ARG         OPENSSL_PREFIX=/usr/local/openssl
-ARG         OPENSSL_DIR=$OPENSSL_PREFIX/conf
+ENV         OPENSSL_PREFIX=/usr/local/openssl
+ENV         OPENSSL_DIR=$OPENSSL_PREFIX/conf
 
 #
 RUN         echo "Installed APT packages:" && \
