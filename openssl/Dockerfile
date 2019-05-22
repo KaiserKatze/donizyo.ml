@@ -23,6 +23,6 @@ RUN         cd "$PATH_APP" && \
             curl -sL "$URL_OPENSSL_TARBALL" -o openssl.tar.gz && \
             tar -xf openssl.tar.gz --one-top-level=openssl --strip-components 1 && \
             cd "$PATH_APP/openssl" && \
-            ./config --prefix="$OPENSSL_PREFIX" --openssldir="$OPENSSL_DIR" && \
-            make && \
-            make install
+            ./config --prefix="$OPENSSL_PREFIX" --openssldir="$OPENSSL_DIR" > /dev/null && \
+            make > /dev/null && \
+            make install > /dev/null
