@@ -43,10 +43,12 @@ RUN         cd "$PATH_APP" && \
             curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
             tar -xf python.tar.xz --one-top-level=python --strip-components 1 &&  \
             cd "$PATH_APP/python" && \
-            ./configure --enable-optimizations \
+            ./configure \
+                --enable-loadable-sqlite-extensions \
                 --enable-ipv6 \
-                --enable-profiling \
                 --enable-shared \
+                --enable-profiling \
+                --enable-optimizations \
                 --with-lto \
                 --with-ssl-default-suites=python \
                 --with-openssl="$OPENSSL_PREFIX" && \
