@@ -2,7 +2,7 @@ services:
   - docker
 
 script:
-  - docker build -t nginx:1.16.0 .
+  - docker build -t nginx:1.16.0 nginx
   - docker images
 
 sudo: required

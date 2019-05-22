@@ -1,6 +1,7 @@
 # Compile and Install Nginx
 
 FROM        ubuntu:18.04 AS base
+MAINTAINER  KaiserKatze
 WORKDIR     /tmp/workdir
 
 ARG         PATH_APP=/root/App
