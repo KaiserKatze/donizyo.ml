@@ -1,8 +1,9 @@
 # Compile and Install Nginx
 
-FROM        ubuntu:18.04 AS base
+FROM        openssl:1.1.1b AS base
 LABEL       maintainer.name="KaiserKatze" \
             maintainer.mail="donizyo@gmail.com"
+WORKDIR     /tmp/workdir
 
 #=======================================================
 # HTTP
@@ -12,32 +13,13 @@ EXPOSE      443/tcp
 # RTMP
 EXPOSE      1935/tcp
 
-WORKDIR     /tmp/workdir
-
 ARG         PATH_APP=/root/App
-ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
 ARG         URL_PCRE_TARBALL=https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
 ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
-ARG         OPENSSL_PREFIX=/usr/local/openssl
-ARG         OPENSSL_DIR=$OPENSSL_PREFIX/conf
 ARG         PCRE_PREFIX=/usr/local/pcre
 ARG         ZLIB_PREFIX=/usr/local/zlib
 
-#
-RUN         apt-get -qq update > /dev/null && \
-            apt-get -qq -y install build-essential curl tar git > /dev/null
-
-RUN         rm -rf "$PATH_APP" "$OPENSSL_PREFIX" "$OPENSSL_DIR" "$PCRE_PREFIX" "$ZLIB_PREFIX" && \
-            mkdir -p "$PATH_APP"
-# openssl
-RUN         cd "$PATH_APP" && \
-            curl -sL "$URL_OPENSSL_TARBALL" -o openssl.tar.gz && \
-            tar -xf openssl.tar.gz --one-top-level=openssl --strip-components 1 && \
-            cd "$PATH_APP/openssl" && \
-            ./config --prefix="$OPENSSL_PREFIX" --openssldir="$OPENSSL_DIR" && \
-            make && \
-            make install
 # pcre
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
