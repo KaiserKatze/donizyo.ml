@@ -25,4 +25,5 @@ RUN         cd "$PATH_APP" && \
             cd "$PATH_APP/openssl" && \
             ./config --prefix="$OPENSSL_PREFIX" --openssldir="$OPENSSL_DIR" > /dev/null && \
             make > /dev/null && \
-            make install > /dev/null
+            make install > /dev/null \
+            make clean > /dev/null

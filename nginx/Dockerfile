@@ -26,7 +26,8 @@ RUN         cd "$PATH_APP" && \
             cd "$PATH_APP/pcre" && \
             ./configure --prefix="$PCRE_PREFIX" && \
             make && \
-            make install
+            make install && \
+            make clean > /dev/null
 # zlib
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
@@ -34,7 +35,8 @@ RUN         cd "$PATH_APP" && \
             cd "$PATH_APP/zlib" && \
             ./configure --prefix="$ZLIB_PREFIX" && \
             make && \
-            make install
+            make install && \
+            make clean > /dev/null
 # nginx
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_NGINX_TARBALL" -o nginx.tar.gz && \
@@ -54,6 +56,7 @@ RUN         cd "$PATH_APP" && \
                 --with-zlib="$PATH_APP/zlib" \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module" && \
             make && \
-            make install
+            make install && \
+            make clean > /dev/null
 
 # configure nginx

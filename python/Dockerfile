@@ -18,7 +18,8 @@ RUN         cd "$PATH_APP" && \
             cd "$PATH_APP/sqlite" && \
             ./configure --prefix="$SQLITE_PREFIX" && \
             make && \
-            make install
+            make install && \
+            make clean > /dev/null
 # python
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
@@ -33,7 +34,8 @@ RUN         cd "$PATH_APP" && \
                 --with-lto \
                 --with-ssl-default-suites=python && \
             make && \
-            make install && \
+            make install  && \
+            make clean > /dev/null && \
             cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
             update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 1 && \
             python -m pip --upgrade pip
