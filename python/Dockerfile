@@ -35,7 +35,7 @@ RUN         cd "$PATH_APP" && \
             curl -sL "$URL_SQLITE_TARBALL" -o sqlite.tar.gz && \
             tar -xf sqlite.tar.gz --one-top-level=sqlite --strip-components 1 && \
             cd "$PATH_APP/sqlite" && \
-            ./config --prefix="$SQLITE_PREFIX" && \
+            ./configure --prefix="$SQLITE_PREFIX" && \
             make && \
             make install
 # python
