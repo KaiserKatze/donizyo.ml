@@ -1,7 +1,17 @@
 # Compile and Install Nginx
 
 FROM        ubuntu:18.04 AS base
-MAINTAINER  KaiserKatze
+LABEL       maintainer.name="KaiserKatze" \
+            maintainer.mail="donizyo@gmail.com"
+
+#=======================================================
+# HTTP
+EXPOSE      80/tcp
+# HTTPS
+EXPOSE      443/tcp
+# RTMP
+EXPOSE      1935/tcp
+
 WORKDIR     /tmp/workdir
 
 ARG         PATH_APP=/root/App
@@ -64,3 +74,5 @@ RUN         cd "$PATH_APP" && \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module" && \
             make && \
             make install
+
+# configure nginx

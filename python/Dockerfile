@@ -2,7 +2,8 @@
 # @see: https://github.com/docker-library/python/blob/34c9df35e9a69e9f0edde88e861b543edb8bc07a/3.7/stretch/Dockerfile
 
 FROM        ubuntu:18.04 AS base
-MAINTAINER  KaiserKatze
+LABEL       maintainer.name="KaiserKatze" \
+            maintainer.mail="donizyo@gmail.com"
 WORKDIR     /tmp/workdir
 
 ARG         PATH_APP=/root/App
