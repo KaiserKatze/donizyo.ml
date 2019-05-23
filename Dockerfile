@@ -18,7 +18,7 @@ RUN         mkdir -p "$PATH_APP"
 FROM        base AS openssl
 
 ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
-ARG         OPENSSL_PREFIX=/usr/local/openssl
+ENV         OPENSSL_PREFIX=/usr/local/openssl
 ARG         OPENSSL_DIR=$OPENSSL_PREFIX/conf
 
 RUN         cd "$PATH_APP" && \
@@ -45,7 +45,7 @@ ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
 ARG         PCRE_PREFIX=/usr/local/pcre
-ARG         ZLIB_PREFIX=/usr/local/zlib
+ENV         ZLIB_PREFIX=/usr/local/zlib
 
 # pcre
 RUN         cd "$PATH_APP" && \
@@ -99,6 +99,7 @@ ARG         PATH_APP=/root/App
 ARG         URL_SQLITE_TARBALL=https://www.sqlite.org/2019/sqlite-autoconf-3280000.tar.gz
 ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
 ARG         SQLITE_PREFIX=/usr/local/sqlite
+ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
 
 # sqlite
 RUN         cd "$PATH_APP" && \
@@ -113,13 +114,13 @@ RUN         cd "$PATH_APP/sqlite" && \
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
             tar -xf python.tar.xz --one-top-level=python --strip-components 1
+# --enable-optimizations
 RUN         cd "$PATH_APP/python" && \
             ./configure \
                 --enable-loadable-sqlite-extensions \
                 --enable-ipv6 \
                 --enable-shared \
                 --enable-profiling \
-                --enable-optimizations \
                 --with-lto \
                 --with-ssl-default-suites=python && \
             make && \
