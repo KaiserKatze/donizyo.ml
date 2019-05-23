@@ -100,6 +100,8 @@ ARG         URL_SQLITE_TARBALL=https://www.sqlite.org/2019/sqlite-autoconf-32800
 ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
 ARG         SQLITE_PREFIX=/usr/local/sqlite
 ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
+# --enable-optimizations
+ARG         OPTIONAL_PYTHON_CONFIG=
 
 # sqlite
 RUN         cd "$PATH_APP" && \
@@ -114,7 +116,6 @@ RUN         cd "$PATH_APP/sqlite" && \
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
             tar -xf python.tar.xz --one-top-level=python --strip-components 1
-# --enable-optimizations
 RUN         cd "$PATH_APP/python" && \
             ./configure \
                 --enable-loadable-sqlite-extensions \
@@ -122,7 +123,8 @@ RUN         cd "$PATH_APP/python" && \
                 --enable-shared \
                 --enable-profiling \
                 --with-lto \
-                --with-ssl-default-suites=python && \
+                --with-ssl-default-suites=python \
+                "$OPTIONAL_PYTHON_CONFIG" && \
             make && \
             make install  && \
             make clean
