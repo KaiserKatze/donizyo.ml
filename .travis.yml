@@ -6,6 +6,6 @@ services:
   - docker
 
 script:
-  - docker build --rm -t bind:9.14.2 .
+  - docker build --target sqlite --rm -t bind:9.14.2 .
   - docker images
   - docker tag $(docker images --filter "label=image=nginx:1.16.0" --format "{{.CreatedAt}}\t{{.ID}}" | sort -nr | head -n 1 -q | cut -f2) donizyo/nginx:1.16.0

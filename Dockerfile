@@ -95,16 +95,11 @@ RUN         cd "$PATH_APP/nginx" && \
             make install && \
             make clean
 #===========================================================================
-FROM        openssl AS python
-LABEL       image=python:3.7.3
+FROM        openssl AS sqlite
+LABEL       image=sqlite:3.28.0
 
-ARG         PATH_APP=/root/App
 ARG         URL_SQLITE_TARBALL=https://www.sqlite.org/2019/sqlite-autoconf-3280000.tar.gz
-ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
 ARG         SQLITE_PREFIX=/usr/local
-ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
-# --enable-optimizations
-ARG         OPTIONAL_PYTHON_CONFIG=
 
 # sqlite
 RUN         cd "$PATH_APP" && \
@@ -115,6 +110,15 @@ RUN         cd "$PATH_APP/sqlite" && \
             make && \
             make install && \
             make clean
+#===========================================================================
+FROM        sqlite AS python
+LABEL       image=python:3.7.3
+
+ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
+ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
+# --enable-optimizations
+ARG         OPTIONAL_PYTHON_CONFIG=
+
 # python
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
