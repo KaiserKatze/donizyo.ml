@@ -16,6 +16,7 @@ RUN         echo "Installing necessary APT packages:" && \
 RUN         mkdir -p "$PATH_APP"
 #===========================================================================
 FROM        base AS openssl
+LABEL       image=openssl:1.1.1b
 
 ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
 ENV         OPENSSL_PREFIX=/usr/local/openssl
@@ -31,6 +32,7 @@ RUN         cd "$PATH_APP/openssl" && \
             make clean
 #===========================================================================
 FROM        openssl AS nginx
+LABEL       image=nginx:1.16.0
 
 # HTTP
 EXPOSE      80/tcp
@@ -94,6 +96,7 @@ RUN         cd "$PATH_APP/nginx" && \
             make clean
 #===========================================================================
 FROM        openssl AS python
+LABEL       image=python:3.7.3
 
 ARG         PATH_APP=/root/App
 ARG         URL_SQLITE_TARBALL=https://www.sqlite.org/2019/sqlite-autoconf-3280000.tar.gz
@@ -133,6 +136,7 @@ RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig
             python -m pip --upgrade pip
 #===========================================================================
 FROM        python AS bind9
+LABEL       image=bind:9.14.2
 
 ARG         GIT_BIND9=https://gitlab.isc.org/isc-projects/bind9.git
 ARG         VERSION_BIND=v9_14_2
