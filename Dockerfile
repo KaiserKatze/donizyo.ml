@@ -44,24 +44,24 @@ ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
-ARG         PCRE_PREFIX=/usr/local/pcre
-ENV         ZLIB_PREFIX=/usr/local/zlib
+ARG         PCRE_PREFIX=/usr/local
+ENV         ZLIB_PREFIX=/usr/local
 
-# pcre
-RUN         cd "$PATH_APP" && \
-            curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
-            tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
-RUN         cd "$PATH_APP/pcre" && \
-            ./configure --prefix="$PCRE_PREFIX" && \
-            make && \
-            make install && \
-            make clean
 # zlib
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
             tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
 RUN         cd "$PATH_APP/zlib" && \
             ./configure --prefix="$ZLIB_PREFIX" && \
+            make && \
+            make install && \
+            make clean
+# pcre
+RUN         cd "$PATH_APP" && \
+            curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
+            tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
+RUN         cd "$PATH_APP/pcre" && \
+            ./configure --prefix="$PCRE_PREFIX" && \
             make && \
             make install && \
             make clean
@@ -98,7 +98,7 @@ FROM        openssl AS python
 ARG         PATH_APP=/root/App
 ARG         URL_SQLITE_TARBALL=https://www.sqlite.org/2019/sqlite-autoconf-3280000.tar.gz
 ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
-ARG         SQLITE_PREFIX=/usr/local/sqlite
+ARG         SQLITE_PREFIX=/usr/local
 ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
 # --enable-optimizations
 ARG         OPTIONAL_PYTHON_CONFIG=
