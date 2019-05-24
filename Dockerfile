@@ -154,8 +154,10 @@ RUN         cd "$PATH_APP/python" && \
                 --with-openssl="$OPENSSL_PREFIX" \
                 --with-ssl-default-suites=python \
                 "$OPTIONAL_PYTHON_CONFIG"
-RUN         make
-RUN         make install
+RUN         cd "$PATH_APP/python" && \
+            make
+RUN         cd "$PATH_APP/python" && \
+            make install
 # python clean up
 RUN         cd "$PATH_APP/python" && \
             make clean && \
