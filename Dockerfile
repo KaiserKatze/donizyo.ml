@@ -19,7 +19,7 @@ FROM        base AS openssl
 LABEL       image=openssl:1.1.1b
 
 ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
-ENV         OPENSSL_PREFIX=/usr/local/openssl
+ENV         OPENSSL_PREFIX=/usr/local
 ARG         OPENSSL_DIR=$OPENSSL_PREFIX/conf
 
 RUN         cd "$PATH_APP" && \
@@ -130,6 +130,7 @@ RUN         cd "$PATH_APP/python" && \
                 --enable-shared \
                 --enable-profiling \
                 --with-lto \
+                --with-openssl="$OPENSSL_PREFIX" \
                 --with-ssl-default-suites=python \
                 "$OPTIONAL_PYTHON_CONFIG" && \
             make && \
