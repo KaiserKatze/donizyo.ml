@@ -160,8 +160,13 @@ RUN         cd "$PATH_APP/python" && \
             make clean && \
             rm -f "$PATH_APP/python.tar.xz"
 RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
-            update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 1 && \
-            python -m pip --upgrade pip
+            update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 1
+# python test
+RUN         python -V
+RUN         python -c "import ssl"
+RUN         python -c "import sqlite3"
+# upgrade pip - package manager
+RUN         python -m pip --upgrade pip
 #===========================================================================
 FROM        python AS bind9
 LABEL       image=bind:9.14.2
@@ -202,3 +207,6 @@ RUN         cd "$PATH_APP/bind9" && \
             make install
 RUN         cd "$PATH_APP/bind9" && \
             make clean
+# bind test
+RUN         named -V
+RUN         named -g
