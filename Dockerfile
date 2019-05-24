@@ -52,6 +52,8 @@ RUN         cd "$PATH_APP/openssl" && \
 RUN         cd "$PATH_APP/openssl" && \
             make clean && \
             rm -f "$PATH_APP/openssl.tar.gz"
+# openssl test
+RUN         openssl version
 #===========================================================================
 FROM        openssl AS nginx
 LABEL       image=nginx:1.16.0
