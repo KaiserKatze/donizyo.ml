@@ -18,10 +18,22 @@ RUN         mkdir -p "$PATH_APP"
 FROM        base AS openssl
 LABEL       image=openssl:1.1.1b
 
+ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
+ENV         ZLIB_PREFIX=/usr/local
 ENV         OPENSSL_PREFIX=/usr/local
 ARG         OPENSSL_DIR=$OPENSSL_PREFIX/ssl
 
+# zlib
+RUN         cd "$PATH_APP" && \
+            curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
+            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
+RUN         cd "$PATH_APP/zlib" && \
+            ./configure --prefix="$ZLIB_PREFIX" && \
+            make && \
+            make install && \
+            make clean
+# openssl
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_OPENSSL_TARBALL" -o openssl.tar.gz && \
             tar -xf openssl.tar.gz --one-top-level=openssl --strip-components 1
@@ -47,22 +59,11 @@ EXPOSE      443/tcp
 EXPOSE      1935/tcp
 
 ARG         URL_PCRE_TARBALL=https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
-ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
 ARG         PCRE_PREFIX=/usr/local
-ENV         ZLIB_PREFIX=/usr/local
 
-# zlib
-RUN         cd "$PATH_APP" && \
-            curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
-            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
-RUN         cd "$PATH_APP/zlib" && \
-            ./configure --prefix="$ZLIB_PREFIX" && \
-            make && \
-            make install && \
-            make clean
 # pcre
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
