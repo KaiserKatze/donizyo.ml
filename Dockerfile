@@ -14,7 +14,7 @@ RUN         echo "Installed APT packages:" && \
 
 RUN         echo "Installing necessary APT packages:" && \
             apt-get -qq update && \
-            apt-get -qq -y install curl tar git gnupg
+            apt-get -qq -y install curl tar git gnupg cmake
 # `curl`: used to download files
 # `tar`: used to unpack/decompress archives
 # `git`: do git stuffs
