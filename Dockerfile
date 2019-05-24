@@ -45,7 +45,7 @@ RUN         cd "$PATH_APP/openssl" && \
                 --openssldir="$OPENSSL_DIR" \
                 --api=1.1.0 \
                 --strict-warnings \
-                zlib && \
+                zlib-dynamic && \
             make && \
             make test && \
             make install
