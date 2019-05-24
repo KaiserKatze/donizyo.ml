@@ -42,11 +42,13 @@ RUN         cd "$PATH_APP/openssl" && \
                 --prefix="$OPENSSL_PREFIX" \
                 --openssldir="$OPENSSL_DIR" \
                 --api=1.1.0 \
-                --strict-warnings && \
+                --strict-warnings \
+                zlib && \
             make && \
             make test && \
             make install && \
             make clean
+RUN         openssl version
 #===========================================================================
 FROM        openssl AS nginx
 LABEL       image=nginx:1.16.0
