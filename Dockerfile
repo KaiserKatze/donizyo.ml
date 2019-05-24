@@ -20,14 +20,19 @@ LABEL       image=openssl:1.1.1b
 
 ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
 ENV         OPENSSL_PREFIX=/usr/local
-ARG         OPENSSL_DIR=$OPENSSL_PREFIX/conf
+ARG         OPENSSL_DIR=$OPENSSL_PREFIX/ssl
 
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_OPENSSL_TARBALL" -o openssl.tar.gz && \
             tar -xf openssl.tar.gz --one-top-level=openssl --strip-components 1
 RUN         cd "$PATH_APP/openssl" && \
-            ./config --prefix="$OPENSSL_PREFIX" --openssldir="$OPENSSL_DIR" && \
+            ./config \
+                --prefix="$OPENSSL_PREFIX" \
+                --openssldir="$OPENSSL_DIR" \
+                --api=1.1.0 \
+                --strict-warnings && \
             make && \
+            make test && \
             make install && \
             make clean
 #===========================================================================
