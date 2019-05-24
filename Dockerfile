@@ -153,9 +153,10 @@ RUN         cd "$PATH_APP/python" && \
                 --with-lto \
                 --with-openssl="$OPENSSL_PREFIX" \
                 --with-ssl-default-suites=python \
-                "$OPTIONAL_PYTHON_CONFIG" && \
-            make && \
-            make install
+                "$OPTIONAL_PYTHON_CONFIG"
+RUN         make
+RUN         make install
+# python clean up
 RUN         cd "$PATH_APP/python" && \
             make clean && \
             rm -f "$PATH_APP/python.tar.xz"
