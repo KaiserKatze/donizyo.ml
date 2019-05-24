@@ -7,10 +7,12 @@ services:
 
 script:
   - docker build --target nginx --rm -t nginx:1.16.0 .
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push donizyo/nginx:1.16.0
-  - docker logout
   - docker images
+
+after_success:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push "$DOCKER_USERNAME/nginx:1.16.0"
+  - docker logout
 
 disabled_script:
   - docker build --target openssl --rm -t openssl:1.1.1b .
