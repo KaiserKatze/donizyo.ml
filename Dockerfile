@@ -32,7 +32,8 @@ RUN         cd "$PATH_APP/zlib" && \
             ./configure --prefix="$ZLIB_PREFIX" && \
             make && \
             make install
-RUN         make clean && \
+RUN         cd "$PATH_APP/zlib" && \
+            make clean && \
             rm -f "$PATH_APP/zlib.tar.gz"
 # openssl
 RUN         cd "$PATH_APP" && \
@@ -48,7 +49,8 @@ RUN         cd "$PATH_APP/openssl" && \
             make && \
             make test && \
             make install
-RUN         make clean && \
+RUN         cd "$PATH_APP/openssl" && \
+            make clean && \
             rm -f "$PATH_APP/openssl.tar.gz"
 #===========================================================================
 FROM        openssl AS nginx
@@ -75,7 +77,8 @@ RUN         cd "$PATH_APP/pcre" && \
             ./configure --prefix="$PCRE_PREFIX" && \
             make && \
             make install
-RUN         make clean && \
+RUN         cd "$PATH_APP/pcre" && \
+            make clean && \
             rm -f "$PATH_APP/pcre.tar.gz"
 # nginx
 RUN         cd "$PATH_APP" && \
@@ -103,7 +106,8 @@ RUN         cd "$PATH_APP/nginx" && \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module" && \
             make && \
             make install
-RUN         make clean && \
+RUN         cd "$PATH_APP/nginx" && \
+            make clean && \
             rm -f "$PATH_APP/nginx.tar.gz"
 #===========================================================================
 FROM        openssl AS sqlite
@@ -120,7 +124,8 @@ RUN         cd "$PATH_APP/sqlite" && \
             ./configure --prefix="$SQLITE_PREFIX" && \
             make && \
             make install
-RUN         make clean && \
+RUN         cd "$PATH_APP/sqlite" && \
+            make clean && \
             rm -f "$PATH_APP/sqlite.tar.gz"
 #===========================================================================
 FROM        sqlite AS python
@@ -147,7 +152,8 @@ RUN         cd "$PATH_APP/python" && \
                 "$OPTIONAL_PYTHON_CONFIG" && \
             make && \
             make install
-RUN         make clean && \
+RUN         cd "$PATH_APP/python" && \
+            make clean && \
             rm -f "$PATH_APP/python.tar.xz"
 RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
             update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 1 && \
@@ -160,7 +166,8 @@ ARG         GIT_BIND9=https://gitlab.isc.org/isc-projects/bind9.git
 ARG         VERSION_BIND=v9_14_2
 
 # bind
-RUN         git clone --verbose \
+RUN         cd "$PATH_APP" && \
+            git clone --verbose \
                 --depth 1 \
                 --single-branch \
                 --branch "$VERSION_BIND" \
@@ -168,7 +175,7 @@ RUN         git clone --verbose \
                 -- "$GIT_BIND9" bind9
 RUN         python -m pip install ply && \
             apt-get -qq -y install libjson-c-dev libkrb5-dev
-RUN         cd bind9 && \
+RUN         cd "$PATH_APP/bind9" && \
             test -d "$PATH_PYTHON_PACKAGES" && \
             ./configure \
                 --prefix=/usr \
@@ -189,4 +196,5 @@ RUN         cd bind9 && \
                 --enable-full-report && \
             make && \
             make install
-RUN         make clean
+RUN         cd "$PATH_APP/bind9" && \
+            make clean
