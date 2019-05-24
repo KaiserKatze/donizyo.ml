@@ -18,24 +18,11 @@ RUN         mkdir -p "$PATH_APP"
 FROM        base AS openssl
 LABEL       image=openssl:1.1.1b
 
-ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
-ENV         ZLIB_PREFIX=/usr/local
 ENV         OPENSSL_PREFIX=/usr/local
 ARG         OPENSSL_DIR=$OPENSSL_PREFIX/ssl
 ARG         LD_LIBRARY_PATH=$OPENSSL_PREFIX/lib
 
-# zlib
-RUN         cd "$PATH_APP" && \
-            curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
-            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
-RUN         cd "$PATH_APP/zlib" && \
-            ./configure --prefix="$ZLIB_PREFIX" && \
-            make && \
-            make install
-RUN         cd "$PATH_APP/zlib" && \
-            make clean && \
-            rm -f "$PATH_APP/zlib.tar.gz"
 # openssl
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_OPENSSL_TARBALL" -o openssl.tar.gz && \
@@ -46,7 +33,7 @@ RUN         cd "$PATH_APP/openssl" && \
                 --openssldir="$OPENSSL_DIR" \
                 --api=1.1.0 \
                 --strict-warnings \
-                zlib-dynamic && \
+                no-comp && \
             make && \
             make test && \
             make install && \
@@ -67,12 +54,25 @@ EXPOSE      443/tcp
 # RTMP
 EXPOSE      1935/tcp
 
+ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_PCRE_TARBALL=https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
 ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
+ENV         ZLIB_PREFIX=/usr/local
 ARG         PCRE_PREFIX=/usr/local
 
+# zlib
+RUN         cd "$PATH_APP" && \
+            curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
+            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
+RUN         cd "$PATH_APP/zlib" && \
+            ./configure --prefix="$ZLIB_PREFIX" && \
+            make && \
+            make install
+RUN         cd "$PATH_APP/zlib" && \
+            make clean && \
+            rm -f "$PATH_APP/zlib.tar.gz"
 # pcre
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
