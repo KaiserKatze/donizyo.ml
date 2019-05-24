@@ -31,8 +31,9 @@ RUN         cd "$PATH_APP" && \
 RUN         cd "$PATH_APP/zlib" && \
             ./configure --prefix="$ZLIB_PREFIX" && \
             make && \
-            make install && \
-            make clean
+            make install
+RUN         make clean && \
+            rm -f "$PATH_APP/zlib.tar.gz"
 # openssl
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_OPENSSL_TARBALL" -o openssl.tar.gz && \
@@ -46,8 +47,9 @@ RUN         cd "$PATH_APP/openssl" && \
                 zlib && \
             make && \
             make test && \
-            make install && \
-            make clean
+            make install
+RUN         make clean && \
+            rm -f "$PATH_APP/openssl.tar.gz"
 #===========================================================================
 FROM        openssl AS nginx
 LABEL       image=nginx:1.16.0
@@ -72,8 +74,9 @@ RUN         cd "$PATH_APP" && \
 RUN         cd "$PATH_APP/pcre" && \
             ./configure --prefix="$PCRE_PREFIX" && \
             make && \
-            make install && \
-            make clean
+            make install
+RUN         make clean && \
+            rm -f "$PATH_APP/pcre.tar.gz"
 # nginx
 RUN         cd "$PATH_APP" && \
             curl -sL "$URL_NGINX_TARBALL" -o nginx.tar.gz && \
@@ -99,8 +102,9 @@ RUN         cd "$PATH_APP/nginx" && \
                 --with-zlib="$PATH_APP/zlib" \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module" && \
             make && \
-            make install && \
-            make clean
+            make install
+RUN         make clean && \
+            rm -f "$PATH_APP/nginx.tar.gz"
 #===========================================================================
 FROM        openssl AS sqlite
 LABEL       image=sqlite:3.28.0
@@ -115,8 +119,9 @@ RUN         cd "$PATH_APP" && \
 RUN         cd "$PATH_APP/sqlite" && \
             ./configure --prefix="$SQLITE_PREFIX" && \
             make && \
-            make install && \
-            make clean
+            make install
+RUN         make clean && \
+            rm -f "$PATH_APP/sqlite.tar.gz"
 #===========================================================================
 FROM        sqlite AS python
 LABEL       image=python:3.7.3
@@ -141,8 +146,9 @@ RUN         cd "$PATH_APP/python" && \
                 --with-ssl-default-suites=python \
                 "$OPTIONAL_PYTHON_CONFIG" && \
             make && \
-            make install  && \
-            make clean
+            make install
+RUN         make clean && \
+            rm -f "$PATH_APP/python.tar.xz"
 RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
             update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 1 && \
             python -m pip --upgrade pip
@@ -182,5 +188,5 @@ RUN         cd bind9 && \
                 --with-gnu-ld \
                 --enable-full-report && \
             make && \
-            make install && \
-            make clean
+            make install
+RUN         make clean
