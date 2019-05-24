@@ -48,7 +48,6 @@ RUN         cd "$PATH_APP/openssl" && \
             make test && \
             make install && \
             make clean
-RUN         openssl version
 #===========================================================================
 FROM        openssl AS nginx
 LABEL       image=nginx:1.16.0

@@ -6,9 +6,11 @@ services:
   - docker
 
 script:
+  - docker build --target openssl --rm -t openssl:1.1.1b .
+  - docker run -d openssl:1.1.1b "openssl version"
   - #docker build --target sqlite --rm -t sqlite:3.28.0 .
-  - docker build --target python --rm -t python:3.7.3 .
-  - docker tag `docker images --filter "label=image=nginx:1.16.0" --format "{{.CreatedAt}}\t{{.ID}}" | sort -nr | head -n 1 -q | cut -f2` donizyo/nginx:1.16.0
+  - #docker build --target python --rm -t python:3.7.3 .
+  - #docker tag `docker images --filter "label=image=nginx:1.16.0" --format "{{.CreatedAt}}\t{{.ID}}" | sort -nr | head -n 1 -q | cut -f2` donizyo/nginx:1.16.0
   - #docker push donizyo/nginx:1.16.0
   - #docker push donizyo/python:3.7.3
   - docker images
