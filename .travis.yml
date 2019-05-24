@@ -11,7 +11,7 @@ script:
 
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push "$DOCKER_USERNAME/nginx:1.16.0"
+  - docker tag nginx:1.16.0 "$DOCKER_USERNAME/nginx:1.16.0" && docker push "$DOCKER_USERNAME/nginx:1.16.0"
   - docker logout
 
 disabled_script:
