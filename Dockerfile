@@ -7,12 +7,21 @@ FROM        ubuntu:18.04 AS base
 WORKDIR     /tmp/workdir
 
 ENV         PATH_APP=/root/App
+ARG         APT_SOURCELIST=/etc/apt/sources.list
 
 RUN         echo "Installed APT packages:" && \
             dpkg -l
+
 RUN         echo "Installing necessary APT packages:" && \
             apt-get -qq update && \
-            apt-get -qq -y install build-essential curl tar git
+            apt-get -qq -y install curl tar git
+
+# @see: [LLVM Debian/Ubuntu packages](https://apt.llvm.org/)
+RUN         echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" >> $APT_SOURCELIST && \
+            echo "deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" >> $APT_SOURCELIST && \
+            curl -sL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
+            apt-get -qq -y install clang-7 lldb-7 lld-7
+
 RUN         mkdir -p "$PATH_APP"
 #===========================================================================
 FROM        base AS openssl
