@@ -23,6 +23,7 @@ ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.ta
 ENV         ZLIB_PREFIX=/usr/local
 ENV         OPENSSL_PREFIX=/usr/local
 ARG         OPENSSL_DIR=$OPENSSL_PREFIX/ssl
+ARG         LD_LIBRARY_PATH=$OPENSSL_PREFIX/lib
 
 # zlib
 RUN         cd "$PATH_APP" && \
@@ -48,7 +49,8 @@ RUN         cd "$PATH_APP/openssl" && \
                 zlib-dynamic && \
             make && \
             make test && \
-            make install
+            make install && \
+            echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> /etc/environment
 RUN         cd "$PATH_APP/openssl" && \
             make clean && \
             rm -f "$PATH_APP/openssl.tar.gz"
