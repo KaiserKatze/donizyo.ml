@@ -45,7 +45,6 @@ RUN         cd "$PATH_APP/openssl" && \
                 --prefix="$OPENSSL_PREFIX" \
                 --openssldir="$OPENSSL_DIR" \
                 --api=1.1.0 \
-                --strict-warnings \
                 no-comp && \
             make && \
             make test && \
