@@ -15,6 +15,10 @@ RUN         echo "Installed APT packages:" && \
 RUN         echo "Installing necessary APT packages:" && \
             apt-get -qq update && \
             apt-get -qq -y install curl tar git gnupg
+# `curl`: used to download files
+# `tar`: used to unpack/decompress archives
+# `git`: do git stuffs
+# `gnupg`: necessary for `apt-key`
 
 # @see: [LLVM Debian/Ubuntu packages](https://apt.llvm.org/)
 RUN         echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" >> $APT_SOURCELIST && \
