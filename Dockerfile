@@ -34,7 +34,7 @@ LABEL       image=openssl:1.1.1b
 ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
 ENV         OPENSSL_PREFIX=/usr/local
 ARG         OPENSSL_DIR=$OPENSSL_PREFIX/ssl
-ARG         LD_LIBRARY_PATH=$OPENSSL_PREFIX/lib
+ENV         LD_LIBRARY_PATH=$OPENSSL_PREFIX/lib
 
 # openssl
 RUN         cd "$PATH_APP" && \
@@ -149,6 +149,7 @@ LABEL       image=python:3.7.3
 
 ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
 ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
+ARG         LD_RUN_PATH=$LD_LIBRARY_PATH
 # --enable-optimizations
 ARG         OPTIONAL_PYTHON_CONFIG=
 
