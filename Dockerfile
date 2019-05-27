@@ -31,8 +31,9 @@ RUN         echo "deb http://ftp.de.debian.org/debian buster main" >> $APT_SOURC
 RUN         apt-get -y install python2.7
 RUN         update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
 
-RUN         which python && python -V || echo 'Python executable not found.'
-RUN         echo "Try to locate Python executable:" && \
+RUN         which python && python -V || \
+            echo 'Python executable not found.' && \
+            echo "Try to locate Python executable:" && \
             find / -name 'python*'
 #===========================================================================
 FROM        base AS openssl
