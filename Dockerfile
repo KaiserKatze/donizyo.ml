@@ -155,7 +155,8 @@ LABEL       image=python:3.7.3
 
 # @see: [libuuid download | SourceForge.net](https://sourceforge.net/projects/libuuid/)
 ARG         URL_UUID_TARBALL=https://nchc.dl.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz
-ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
+ARG         GIT_PYTHON=https://github.com/python/cpython
+ARG         VERSION_PYTHON=v3.7.3
 ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
 ARG         LD_RUN_PATH=$LD_LIBRARY_PATH
 # --enable-optimizations
@@ -172,37 +173,59 @@ ARG         OPTIONAL_PYTHON_CONFIG=
 #            make clean && \
 #            rm -f "$PATH_APP/libuuid.tar.gz"
 
-# python
-RUN         curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
-            tar -xf python.tar.xz --one-top-level=python --strip-components 1
+RUN         set -e
+
+RUN         git clone --verbose \
+                --depth 1 \
+                --single-branch \
+                --branch "$VERSION_PYTHON" \
+                --no-tags \
+                -- "$GIT_PYTHON" python
 
 WORKDIR     $PATH_APP/python
-RUN         ./configure \
-                --enable-ipv6 \
-                --enable-profiling \
-                --enable-shared \
-                --with-lto \
-                --with-openssl="$OPENSSL_PREFIX" \
-                "$OPTIONAL_PYTHON_CONFIG"
-RUN         cat config.log
-RUN         make
-RUN         make install
+
+RUN         ./configure --with-pydebug
+RUN         make -j4 regen-all
+RUN         changes=`git status --porcelain`
+# Check for changes in regenerated files
+RUN         if ! test -z "$changes" \
+            then \
+                echo "Generated files not up to date"; \
+                echo "$changes"; \
+                exit 1; \
+            fi
+RUN         make -j4
+RUN         make pythoninfo
+
+RUN         ./python Tools/scripts/patchcheck.py
+RUN         make smelly
+
+#RUN         ./configure \
+#                --enable-ipv6 \
+#                --enable-profiling \
+#                --enable-shared \
+#                --with-lto \
+#                --with-openssl="$OPENSSL_PREFIX" \
+#                "$OPTIONAL_PYTHON_CONFIG"
+#RUN         cat config.log
+#RUN         make
+#RUN         make install
 
 WORKDIR     $PATH_APP
 RUN         rm -rf python python.tar.xz
 
-RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
-            update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 10
+#RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
+#            update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 10
 # manually check update-alternatives
-RUN         update-alternatives --display python
+#RUN         update-alternatives --display python
 
 # python test
-RUN         python -V
-RUN         python -c "import ssl"
-RUN         python -c "import sqlite3"
+#RUN         python -V
+#RUN         python -c "import ssl"
+#RUN         python -c "import sqlite3"
 
 # upgrade pip - package manager
-RUN         python -m pip --upgrade pip
+#RUN         python -m pip --upgrade pip
 #===========================================================================
 #FROM        python AS bind9
 #LABEL       image=bind:9.14.2
