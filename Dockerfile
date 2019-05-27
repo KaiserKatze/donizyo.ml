@@ -13,8 +13,8 @@ RUN         echo "Installed APT packages:" && \
             dpkg -l
 
 RUN         echo "Installing necessary APT packages:" && \
-            apt-get -qq update && \
-            apt-get -qq -y install curl tar git gnupg cmake
+            apt-get update && \
+            apt-get -y install curl tar git gnupg cmake
 # `curl`: used to download files
 # `tar`: used to unpack/decompress archives
 # `git`: do git stuffs
@@ -24,7 +24,16 @@ RUN         echo "Installing necessary APT packages:" && \
 RUN         echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" >> $APT_SOURCELIST && \
             echo "deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" >> $APT_SOURCELIST && \
             curl -sL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-            apt-get -qq -y install clang-7 lldb-7 lld-7
+            apt-get -y install clang-7 lldb-7 lld-7
+
+# install python2.7 on ubuntu:18.04(debian:buster)
+RUN         echo "deb http://ftp.de.debian.org/debian buster main" >> $APT_SOURCELIST
+RUN         apt-get -y install python2.7
+RUN         update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
+
+RUN         which python && python -V || echo 'Python executable not found.'
+RUN         echo "Try to locate Python executable:" && \
+            find / -name 'python*'
 #===========================================================================
 FROM        base AS openssl
 LABEL       image=openssl:1.1.1b
@@ -207,7 +216,7 @@ RUN         python -m pip --upgrade pip
 #                --no-tags \
 #                -- "$GIT_BIND9" bind9
 #RUN         python -m pip install ply && \
-#            apt-get -qq -y install libjson-c-dev libkrb5-dev
+#            apt-get -y install libjson-c-dev libkrb5-dev
 #RUN         cd "bind9" && \
 #            test -d "$PATH_PYTHON_PACKAGES" && \
 #            ./configure \
