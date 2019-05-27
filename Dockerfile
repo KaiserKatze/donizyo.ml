@@ -48,19 +48,19 @@ ARG         URI_ENVVAR=/etc/environment
 # openssl
 RUN         curl -sL "$URL_OPENSSL_TARBALL" -o openssl.tar.gz && \
             tar -xf openssl.tar.gz --one-top-level=openssl --strip-components 1
-RUN         cd "openssl" && \
-            ./config \
+WORKDIR     $PATH_APP/openssl
+RUN         ./config \
                 --prefix="$OPENSSL_PREFIX" \
                 --openssldir="$OPENSSL_DIR" \
                 --api=1.1.0 \
-                no-comp && \
-            make && \
-            make test && \
-            make install
+                no-comp
+RUN         make
+RUN         make test
+RUN         make install
 RUN         echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $URI_ENVVAR
-RUN         cd "openssl" && \
-            make clean && \
-            rm -f "$PATH_APP/openssl.tar.gz"
+
+WORKDIR     $PATH_APP
+RUN         rm -rf openssl openssl.tar.gz
 # openssl test
 RUN         openssl version
 #===========================================================================
@@ -140,13 +140,15 @@ ARG         SQLITE_PREFIX=/usr/local
 # sqlite
 RUN         curl -sL "$URL_SQLITE_TARBALL" -o sqlite.tar.gz && \
             tar -xf sqlite.tar.gz --one-top-level=sqlite --strip-components 1
-RUN         cd "sqlite" && \
-            ./configure --prefix="$SQLITE_PREFIX" && \
-            make && \
-            make install
-RUN         cd "sqlite" && \
-            make clean && \
-            rm -f "$PATH_APP/sqlite.tar.gz"
+WORKDIR     $PATH_APP/sqlite
+RUN         ./configure --prefix="$SQLITE_PREFIX"
+RUN         make
+RUN         make install
+
+# @see: [How SQLite Is Tested](https://www.sqlite.org/testing.html)
+
+WORKDIR     $PATH_APP
+RUN         rm -rf sqlite sqlite.tar.gz
 #===========================================================================
 FROM        sqlite AS python
 LABEL       image=python:3.7.3
@@ -185,10 +187,9 @@ RUN         ./configure \
 RUN         cat config.log
 RUN         make
 RUN         make install
-RUN         make clean
 
 WORKDIR     $PATH_APP
-RUN         rm -f python.tar.xz
+RUN         rm -rf python python.tar.xz
 
 RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
             update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 10

@@ -6,7 +6,7 @@ services:
   - docker
 
 script:
-  - docker build --target openssl --rm -t openssl:1.1.1b .
+  - docker build --target sqlite --rm -t sqlite:3.28.0 .
   - docker images
 
 after_success:
@@ -18,6 +18,6 @@ after_success:
 
 disabled_script:
   - docker build --target nginx --rm -t nginx:1.16.0 .
-  - docker build --target sqlite --rm -t sqlite:3.28.0 .
+  - docker build --target openssl --rm -t openssl:1.1.1b .
   - docker build --target python --rm -t python:3.7.3 .
   - docker build --target bind9 --rm -t bind:9.14.2 .
