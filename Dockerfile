@@ -191,7 +191,7 @@ WORKDIR     $PATH_APP
 RUN         rm -f python.tar.xz
 
 RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
-            update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 1
+            update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 10
 # manually check update-alternatives
 RUN         update-alternatives --display python
 
