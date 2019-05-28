@@ -186,6 +186,8 @@ RUN         ./configure \
                 "$OPTIONAL_PYTHON_CONFIG"
 RUN         cat config.log
 RUN         make
+RUN         find . -name 'python*' && exit
+# breakpoint
 RUN         make install
 
 WORKDIR     $PATH_APP
