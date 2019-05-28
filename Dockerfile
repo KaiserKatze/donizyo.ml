@@ -191,10 +191,9 @@ RUN         cat ./python-config.py
 RUN         cat ./python-gdb.py
 RUN         find / -name 'libpython*.so*' -type f
 
-RUN         alias pytest='/lib/ld-linux.so.2 --library-path $PATH_APP/python $PATH_APP/python/python'
-RUN         pytest -E -S -m sysconfig --generate-posix-vars
-RUN         pytest -E setup.py build
-RUN         pytest -m test.pythoninfo
+RUN         /lib/ld-linux.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -E -S -m sysconfig --generate-posix-vars
+RUN         /lib/ld-linux.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -E setup.py build
+RUN         /lib/ld-linux.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -m test.pythoninfo
 # breakpoint
 RUN         make install
 
