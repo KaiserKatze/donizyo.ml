@@ -190,8 +190,11 @@ RUN         cat ./python-config
 RUN         cat ./python-config.py
 RUN         cat ./python-gdb.py
 RUN         find / -name 'libpython*.so*' -type f
-ARG         LD_LIBRARY_PATH=$PATH_APP/python:$LD_LIBRARY_PATH
-RUN         echo $LD_LIBRARY_PATH
+
+ARG         LD_PYTHON_CONF="/etc/ld.so.conf.d/python.conf"
+RUN         touch $LD_PYTHON_CONF && cat $LD_PYTHON_CONF
+RUN         cat "$PATH_APP/python" > $LD_PYTHON_CONF && ldconfig
+
 RUN         ./python -E -S -m sysconfig --generate-posix-vars
 RUN         ./python -E setup.py build
 RUN         ./python -m test.pythoninfo
