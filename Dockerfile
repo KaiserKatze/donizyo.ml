@@ -54,8 +54,8 @@ RUN         ./config \
                 --openssldir="$OPENSSL_DIR" \
                 --api=1.1.0 \
                 no-comp
-RUN         make
-RUN         make test
+RUN         make -j4
+RUN         make -j4 test
 RUN         make install
 RUN         echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $URI_ENVVAR
 
@@ -142,7 +142,7 @@ RUN         curl -sL "$URL_SQLITE_TARBALL" -o sqlite.tar.gz && \
             tar -xf sqlite.tar.gz --one-top-level=sqlite --strip-components 1
 WORKDIR     $PATH_APP/sqlite
 RUN         ./configure --prefix="$SQLITE_PREFIX"
-RUN         make
+RUN         make -j4
 RUN         make install
 
 # @see: [How SQLite Is Tested](https://www.sqlite.org/testing.html)
@@ -185,7 +185,7 @@ RUN         ./configure \
                 --with-openssl="$OPENSSL_PREFIX" \
                 "$OPTIONAL_PYTHON_CONFIG"
 RUN         cat config.log
-RUN         make
+RUN         make -j4
 RUN         cat ./python-config
 RUN         cat ./python-config.py
 RUN         cat ./python-gdb.py
