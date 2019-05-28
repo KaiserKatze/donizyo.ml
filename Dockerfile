@@ -189,6 +189,7 @@ RUN         make -j4
 RUN         cat ./python-config
 RUN         cat ./python-config.py
 RUN         cat ./python-gdb.py
+RUN         find / -name 'libpython*.so*' -type f
 RUN         ./python -E -S -m sysconfig --generate-posix-vars
 RUN         ./python -E setup.py build
 RUN         ./python -m test.pythoninfo
