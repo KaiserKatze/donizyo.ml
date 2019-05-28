@@ -192,6 +192,10 @@ RUN         cat ./python-gdb.py
 RUN         find / -name 'libpython*.so*' -type f
 
 RUN         export LD_LIBRARY_PATH=$PATH_APP/python:$LD_LIBRARY_PATH
+RUN         echo $LD_LIBRARY_PATH
+ARG         LD_PYTHON_CONF="/etc/ld.so.conf.d/python.conf"
+RUN         touch $LD_PYTHON_CONF && cat $LD_PYTHON_CONF
+RUN         echo "$PATH_APP/python" > $LD_PYTHON_CONF && ldconfig
 
 RUN         ./python -E -S -m sysconfig --generate-posix-vars
 RUN         ./python -E setup.py build
@@ -202,7 +206,7 @@ RUN         make install
 WORKDIR     $PATH_APP
 RUN         rm -rf python python.tar.xz
 
-RUN         cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
+RUN         echo "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
             update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 10
 # manually check update-alternatives
 RUN         update-alternatives --display python
