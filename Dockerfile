@@ -14,17 +14,8 @@ RUN         echo "Installed APT packages:" && \
 
 RUN         echo "Installing necessary APT packages:" && \
             apt-get update && \
-            apt-get -y install curl tar git gnupg cmake
-# `curl`: used to download files
-# `tar`: used to unpack/decompress archives
-# `git`: do git stuffs
-# `gnupg`: necessary for `apt-key`
-
-# @see: [LLVM Debian/Ubuntu packages](https://apt.llvm.org/)
-RUN         echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" >> $APT_SOURCELIST && \
-            echo "deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic main" >> $APT_SOURCELIST && \
-            curl -sL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-            apt-get -y install clang-7 lldb-7 lld-7
+            apt-get -y install curl tar git && \
+            apt-get -y install build-essential
 
 # install python2.7 on ubuntu:18.04(debian:buster)
 RUN         echo "deb http://ftp.de.debian.org/debian buster main" >> $APT_SOURCELIST
