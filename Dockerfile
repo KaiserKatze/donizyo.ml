@@ -1,50 +1,57 @@
 # Compile and Install Nginx, Python, Bind9
-# maintainer.name="KaiserKatze"
-# maintainer.mail="donizyo@gmail.com"
-
 #===========================================================================
 FROM        ubuntu:18.04 AS base
+LABEL       maintainer.name="KaiserKatze"
+LABEL       maintainer.mail="donizyo@gmail.com"
 
 ENV         PATH_APP=/root/App
 WORKDIR     $PATH_APP
-ARG         APT_SOURCELIST=/etc/apt/sources.list
 
-RUN         echo "Installed APT packages:" && \
+# list installed packages
+RUN         echo "Installed packages:" && \
             dpkg -l
 
-RUN         echo "Installing necessary APT packages:" && \
+# install necessary tools
+RUN         echo "Installing necessary packages:" && \
             apt-get update && \
             apt-get -y install curl tar git && \
             apt-get -y install build-essential
 
 # install python2.7 on ubuntu:18.04(debian:buster)
+ARG         APT_SOURCELIST=/etc/apt/sources.list
 RUN         echo "deb http://ftp.de.debian.org/debian buster main" >> $APT_SOURCELIST
 RUN         apt-get -y install python2.7
 RUN         update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
-
+# test if python2.7 is successfully installed
 RUN         which python && python -V || \
             echo 'Python executable not found.' && \
             echo "Try to locate Python executable:" && \
             find / -name 'python*'
 #===========================================================================
 FROM        base AS openssl
-LABEL       image=openssl:1.1.1b
+ARG         VERSION=1.1.0k
+LABEL       image=openssl:$VERSION
 
-ARG         URL_OPENSSL_TARBALL=https://www.openssl.org/source/openssl-1.1.1b.tar.gz
+ARG         GIT_OPENSSL=https://github.com/openssl/openssl
+ARG         VERSION_OPENSSL="OpenSSL_"${VERSION//./_}
 ENV         OPENSSL_PREFIX=/usr/local
 ENV         OPENSSL_DIR=$OPENSSL_PREFIX/ssl
 ENV         LD_LIBRARY_PATH=$OPENSSL_PREFIX/lib
 ARG         URI_ENVVAR=/etc/environment
 
 # openssl
-RUN         curl -sL "$URL_OPENSSL_TARBALL" -o openssl.tar.gz && \
-            tar -xf openssl.tar.gz --one-top-level=openssl --strip-components 1
+RUN         git clone --verbose \
+                --depth 1 \
+                --single-branch \
+                --branch "$VERSION_OPENSSL" \
+                --no-tags \
+                -- "$GIT_OPENSSL" openssl
 WORKDIR     $PATH_APP/openssl
 RUN         ./config \
                 --prefix="$OPENSSL_PREFIX" \
                 --openssldir="$OPENSSL_DIR" \
-                --api=1.1.0 \
                 no-comp
+
 RUN         make -j4
 RUN         make -j4 test
 RUN         make install
