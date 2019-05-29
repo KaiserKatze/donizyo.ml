@@ -8,7 +8,6 @@ services:
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker pull $DOCKER_USERNAME/openssl:1.1.0k
-  - docker tag $DOCKER_USERNAME/openssl:1.1.0k openssl
 
 script:
   - docker build -t python:3.7.3 ./python
