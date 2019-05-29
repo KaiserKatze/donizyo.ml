@@ -5,15 +5,17 @@ dist: trusty
 services:
   - docker
 
+before_script:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
 script:
   - docker build --target openssl --rm -t openssl:1.1.0k .
   - docker images
 
 after_success:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker tag `docker images --filter "label=image=nginx:1.16.0" --format "{{.CreatedAt}}\t{{.ID}}" | sort -nr | head -n 1 -q | cut -f2` "$DOCKER_USERNAME/nginx:1.16.0" && docker push "$DOCKER_USERNAME/nginx:1.16.0"
-  - docker tag `docker images --filter "label=image=python:3.7.3" --format "{{.CreatedAt}}\t{{.ID}}" | sort -nr | head -n 1 -q | cut -f2` "$DOCKER_USERNAME/python:3.7.3" && docker push "$DOCKER_USERNAME/python:3.7.3"
-  - docker tag bind:9.14.2 "$DOCKER_USERNAME/bind:9.14.2" && docker push "$DOCKER_USERNAME/bind:9.14.2"
+  - docker tag openssl:1.1.0k "$DOCKER_USERNAME/openssl:1.1.0k" && docker push "$DOCKER_USERNAME/openssl:1.1.0k"
+
+after_script:
   - docker logout
 
 disabled_script:
@@ -21,3 +23,6 @@ disabled_script:
   - docker build --target sqlite --rm -t sqlite:3.28.0 .
   - docker build --target python --rm -t python:3.7.3 .
   - docker build --target bind9 --rm -t bind:9.14.2 .
+  - docker tag `docker images --filter "label=image=nginx:1.16.0" --format "{{.CreatedAt}}\t{{.ID}}" | sort -nr | head -n 1 -q | cut -f2` "$DOCKER_USERNAME/nginx:1.16.0" && docker push "$DOCKER_USERNAME/nginx:1.16.0"
+  - docker tag `docker images --filter "label=image=python:3.7.3" --format "{{.CreatedAt}}\t{{.ID}}" | sort -nr | head -n 1 -q | cut -f2` "$DOCKER_USERNAME/python:3.7.3" && docker push "$DOCKER_USERNAME/python:3.7.3"
+  - docker tag bind:9.14.2 "$DOCKER_USERNAME/bind:9.14.2" && docker push "$DOCKER_USERNAME/bind:9.14.2"
