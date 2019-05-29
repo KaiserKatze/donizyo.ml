@@ -29,11 +29,10 @@ RUN         which python && python -V || \
             find / -name 'python*'
 #===========================================================================
 FROM        base AS openssl
-ARG         VERSION=1.1.0k
-LABEL       image=openssl:$VERSION
+LABEL       image=openssl:1.1.0k
 
 ARG         GIT_OPENSSL=https://github.com/openssl/openssl
-ARG         VERSION_OPENSSL="OpenSSL_"${VERSION//./_}
+ARG         VERSION_OPENSSL=OpenSSL_1_1_0k
 ENV         OPENSSL_PREFIX=/usr/local
 ENV         OPENSSL_DIR=$OPENSSL_PREFIX/ssl
 ENV         LD_LIBRARY_PATH=$OPENSSL_PREFIX/lib
