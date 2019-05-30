@@ -8,7 +8,7 @@ services:
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker pull $DOCKER_USERNAME/sqlite:3.28.0
-  - docker tag $DOCKER_USERNAME/sqlite:3.28.0 openssl
+  - docker tag $DOCKER_USERNAME/sqlite:3.28.0 sqlite
 
 script:
   - docker build -t python:3.7.3 ./python
