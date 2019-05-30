@@ -12,7 +12,7 @@ RUN         git clone --verbose \
                 --no-tags \
                 -- "$GIT_BIND9" bind9
 RUN         python -m pip install ply && \
-            apt-get -y install libjson-c-dev libkrb5-dev
+            apt-get -y install libjson-c-dev libkrb5-dev libcap-dev
 
 WORKDIR     $PATH_APP/bind9
 RUN         test -d "$PATH_PYTHON_PACKAGES" && \
