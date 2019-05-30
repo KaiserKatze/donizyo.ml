@@ -7,23 +7,34 @@ services:
 
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker pull $DOCKER_USERNAME/python:3.7.3 && docker tag $DOCKER_USERNAME/python:3.7.3 python
 
 script:
-  - docker build -t base ./base
-  - docker build -t openssl ./openssl
-  - docker build -t sqlite ./python/sqlite
-  - docker build -t python ./python
   - docker build -t bind ./bind
   - docker images
 
 after_success:
-  - docker tag openssl $DOCKER_USERNAME/openssl:1.1.0k && docker push $DOCKER_USERNAME/openssl:1.1.0k
-  - docker tag sqlite $DOCKER_USERNAME/sqlite:3.28.0 && docker push $DOCKER_USERNAME/sqlite:3.28.0
-  - docker tag python $DOCKER_USERNAME/python:3.7.3 && docker push $DOCKER_USERNAME/python:3.7.3
   - docker tag bind $DOCKER_USERNAME/bind:9.14.2 && docker push $DOCKER_USERNAME/bind:9.14.2
 
 after_script:
   - docker logout
 
-disabled_script:
-  - #docker pull $DOCKER_USERNAME/sqlite:3.28.0 && docker tag $DOCKER_USERNAME/sqlite:3.28.0 sqlite
+
+
+complete_procedure:
+  before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  script:
+    - docker build -t base ./base
+    - docker build -t openssl ./openssl
+    - docker build -t sqlite ./python/sqlite
+    - docker build -t python ./python
+    - docker build -t bind ./bind
+    - docker images
+  after_success:
+    - docker tag openssl $DOCKER_USERNAME/openssl:1.1.0k && docker push $DOCKER_USERNAME/openssl:1.1.0k
+    - docker tag sqlite $DOCKER_USERNAME/sqlite:3.28.0 && docker push $DOCKER_USERNAME/sqlite:3.28.0
+    - docker tag python $DOCKER_USERNAME/python:3.7.3 && docker push $DOCKER_USERNAME/python:3.7.3
+    - docker tag bind $DOCKER_USERNAME/bind:9.14.2 && docker push $DOCKER_USERNAME/bind:9.14.2
+  after_script:
+    - docker logout
