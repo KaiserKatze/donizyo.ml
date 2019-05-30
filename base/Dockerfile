@@ -25,3 +25,16 @@ RUN         which python && python -V || \
             echo 'Python executable not found.' && \
             echo "Try to locate Python executable:" && \
             find / -name 'python*'
+
+# zlib
+ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
+
+RUN         curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
+            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
+RUN         cd "zlib" && \
+            ./configure && \
+            make && \
+            make install
+RUN         cd "zlib" && \
+            make clean && \
+            rm -f "$PATH_APP/zlib.tar.gz"

@@ -8,24 +8,12 @@ EXPOSE      443/tcp
 # RTMP
 EXPOSE      1935/tcp
 
-ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_PCRE_TARBALL=https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
 ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
-ENV         ZLIB_PREFIX=/usr/local
 ARG         PCRE_PREFIX=/usr/local
 
-# zlib
-RUN         curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
-            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
-RUN         cd "zlib" && \
-            ./configure --prefix="$ZLIB_PREFIX" && \
-            make && \
-            make install
-RUN         cd "zlib" && \
-            make clean && \
-            rm -f "$PATH_APP/zlib.tar.gz"
 # pcre
 RUN         curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
             tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
