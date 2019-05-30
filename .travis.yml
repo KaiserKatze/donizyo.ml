@@ -11,7 +11,7 @@ before_script:
   - docker tag $DOCKER_USERNAME/openssl:1.1.0k openssl
 
 script:
-  - docker build -t sqlite:3.28.0 ./sqlite
+  - docker build -t sqlite:3.28.0 ./python/sqlite
   - docker images
 
 after_success:
