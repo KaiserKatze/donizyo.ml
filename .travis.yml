@@ -9,6 +9,7 @@ before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 script:
+  - docker build ./base
   - docker build -t openssl:1.1.0k ./openssl
   - docker build -t sqlite:3.28.0 ./python/sqlite
   - docker build -t python:3.7.3 ./python
