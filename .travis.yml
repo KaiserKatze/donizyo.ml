@@ -11,12 +11,17 @@ before_script:
   - docker tag $DOCKER_USERNAME/openssl:1.1.0k openssl
 
 script:
-  - docker build -t python:3.7.3 ./python
+  - docker build -t sqlite:3.28.0 ./sqlite
   - docker images
 
 after_success:
-  - docker tag python:3.7.3 $DOCKER_USERNAME/python:3.7.3
-  - docker push $DOCKER_USERNAME/python:3.7.3
+  - docker tag sqlite:3.28.0 $DOCKER_USERNAME/sqlite:3.28.0
+  - docker push $DOCKER_USERNAME/sqlite:3.28.0
 
 after_script:
   - docker logout
+
+disabled_script:
+  - docker build -t python:3.7.3 ./python
+  - docker tag python:3.7.3 $DOCKER_USERNAME/python:3.7.3
+  - docker push $DOCKER_USERNAME/python:3.7.3

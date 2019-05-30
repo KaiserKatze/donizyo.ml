@@ -1,4 +1,4 @@
-FROM        openssl AS python
+FROM        sqlite AS python
 LABEL       image=python:3.7.3
 
 ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
