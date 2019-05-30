@@ -26,6 +26,10 @@ RUN         cat ./python-config.py
 RUN         cat ./python-gdb.py
 RUN         find / -name 'libpython*.so*' -type f
 
+RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -V || echo "Failed python version test."
+RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -c "import ssl" || echo "Failed python openssl test."
+RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -c "import sqlite3" || echo "Failed python sqlite3 test."
+
 RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -E -S -m sysconfig --generate-posix-vars
 RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -E setup.py build
 RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -m test.pythoninfo
