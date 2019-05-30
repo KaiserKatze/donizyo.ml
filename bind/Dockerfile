@@ -1,4 +1,4 @@
-FROM        python AS bind9
+FROM        python AS bind
 LABEL       image=bind:9.14.2
 
 ARG         GIT_BIND9=https://gitlab.isc.org/isc-projects/bind9.git
@@ -13,8 +13,9 @@ RUN         git clone --verbose \
                 -- "$GIT_BIND9" bind9
 RUN         python -m pip install ply && \
             apt-get -y install libjson-c-dev libkrb5-dev
-RUN         cd "bind9" && \
-            test -d "$PATH_PYTHON_PACKAGES" && \
+
+WORKDIR     $PATH_APP/bind9
+RUN         test -d "$PATH_PYTHON_PACKAGES" && \
             ./configure \
                 --prefix=/usr \
                 --mandir=/usr/share/man \
@@ -25,17 +26,18 @@ RUN         cd "bind9" && \
                 --enable-largefile \
                 --with-libtool \
                 --with-libjson \
-                --with-zlib="$ZLIB_PREFIX" \
                 --with-python=python \
                 --with-python-install-dir="$PATH_PYTHON_PACKAGES" \
                 --with-openssl="$OPENSSL_PREFIX" \
                 --with-gssapi \
                 --with-gnu-ld \
-                --enable-full-report && \
-            make && \
-            make install
-RUN         cd "bind9" && \
-            make clean
+                --enable-full-report
+RUN         make
+RUN         make install
+
+WORKDIR     $PATH_APP
+RUN         rm -rf bind9
+
 # bind test
 RUN         named -V
 RUN         named -g
