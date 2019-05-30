@@ -7,6 +7,8 @@ ARG         LD_RUN_PATH=$LD_LIBRARY_PATH
 # --enable-optimizations
 ARG         OPTIONAL_PYTHON_CONFIG=
 
+RUN         apt-get -y install libffi-dev
+
 # python
 RUN         curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
             tar -xf python.tar.xz --one-top-level=python --strip-components 1
