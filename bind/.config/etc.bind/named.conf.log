@@ -1,0 +1,20 @@
+// @see: https://kb.isc.org/docs/aa-01526
+// @see: ftp://ftp.isc.org/isc/bind9/9.8.0-P4/doc/arm/Bv9ARM.ch06.html#id2575648
+logging {
+    channel b_query {
+        file "/var/log/bind/query.log" versions 3 size 1m;
+        print-category no;
+        print-severity no;
+        print-time yes;
+        severity info;
+    };
+    channel b_default {
+        file "/var/log/bind/default.log" version 3 size 5m;
+        print-category yes;
+        print-severity yes;
+        print-time yes;
+    };
+
+    category default { b_default };
+    category queries { b_query; };
+};
