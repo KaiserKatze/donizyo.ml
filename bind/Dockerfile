@@ -62,7 +62,9 @@ RUN         cp bind.logrotate /etc/logrotate.d/bind && \
             chown root:root /etc/logrotate.d/bind
 RUN         cp -r etc.bind/* /etc/bind && \
             chmod 644 /etc/bind/* && \
-            chmod 2755 /etc/bind /etc/bind/zones && \
+            chmod 2755 /etc/bind && \
+            mkdir -p /etc/bind/zones && \
+            chmod 2755 /etc/bind/zones && \
             chown -R bind:bind /etc/bind
 RUN         mkdir -p /var/cache/bind && \
             chmod 2755 /var/cache/bind && \
