@@ -1,6 +1,9 @@
 FROM        python AS bind
 LABEL       image=bind:9.14.2
 
+# DNS
+EXPOSE      53/udp
+
 ARG         GIT_BIND9=https://gitlab.isc.org/isc-projects/bind9.git
 ARG         VERSION_BIND=v9_14_2
 
@@ -42,6 +45,8 @@ RUN         rm -rf bind9
 RUN         named -V
 
 # configuration
+RUN         uesradd -M -s /usr/sbin/nologin bind
 WORKDIR     /etc/bind
 # @see: https://www.isc.org/downloads/bind/bind-keys/
 RUN         curl -sL https://ftp.isc.org/isc/bind9/keys/9.11/bind.keys.v9_11 -o bind.keys
+
