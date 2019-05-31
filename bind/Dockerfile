@@ -42,6 +42,7 @@ WORKDIR     $PATH_APP
 RUN         rm -rf bind9
 
 # configuration
+RUN         apt-get -y install adduser
 RUN         uesradd -M -s /usr/sbin/nologin bind
 WORKDIR     /etc/bind
 # @see: https://www.isc.org/downloads/bind/bind-keys/
