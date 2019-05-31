@@ -32,7 +32,7 @@ RUN         test -d "$PATH_PYTHON_PACKAGES" && \
                 --with-gssapi \
                 --with-gnu-ld \
                 --enable-full-report
-RUN         make
+RUN         make -j4
 RUN         make install
 
 WORKDIR     $PATH_APP
@@ -43,7 +43,7 @@ RUN         named -V
 WORKDIR     /etc/bind
 RUN         rndc-confgen -a
 RUN         touch named.conf
-RUN         named
+RUN         named -g
 RUN         ps -ef | grep named
 RUN         rndc status
 RUN         dig @127.0.0.1 . NS
