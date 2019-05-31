@@ -40,10 +40,3 @@ RUN         rm -rf bind9
 
 # bind test
 RUN         named -V
-WORKDIR     /etc/bind
-RUN         rndc-confgen -a
-RUN         touch named.conf
-RUN         named -g
-RUN         ps -ef | grep named
-RUN         rndc status
-RUN         dig @127.0.0.1 . NS
