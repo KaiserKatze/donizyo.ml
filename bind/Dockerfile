@@ -41,9 +41,6 @@ RUN         make install
 WORKDIR     $PATH_APP
 RUN         rm -rf bind9
 
-# bind test
-RUN         named -V
-
 # configuration
 RUN         uesradd -M -s /usr/sbin/nologin bind
 WORKDIR     /etc/bind
@@ -64,3 +61,7 @@ RUN         cp etc.bind/* /etc/bind
 
 WORKDIR     /tmp
 RUN         rm -rf /tmp/self
+
+# bind test
+RUN         named -V
+RUN         named -g
