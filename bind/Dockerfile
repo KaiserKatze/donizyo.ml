@@ -40,3 +40,8 @@ RUN         rm -rf bind9
 
 # bind test
 RUN         named -V
+
+# configuration
+WORKDIR     /etc/bind
+# @see: https://www.isc.org/downloads/bind/bind-keys/
+RUN         curl -sL https://ftp.isc.org/isc/bind9/keys/9.11/bind.keys.v9_11 -o bind.keys
