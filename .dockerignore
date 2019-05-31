@@ -1,3 +1,4 @@
 .git
 .editorconfig
 .travis.yml
+.config/

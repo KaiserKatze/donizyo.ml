@@ -50,3 +50,17 @@ WORKDIR     /etc/bind
 # @see: https://www.isc.org/downloads/bind/bind-keys/
 RUN         curl -sL https://ftp.isc.org/isc/bind9/keys/9.11/bind.keys.v9_11 -o bind.keys
 
+WORKDIR     /tmp
+ARG         GIT_SELF=https://github.com/donizyo/donizyo.ml.git
+RUN         git clone --verbose \
+                --depth 1 \
+                --single-branch \
+                --branch master \
+                --no-tags \
+                -- "$GIT_SELF" self
+WORKDIR     /tmp/self/bind/.config
+RUN         cp bind.logrotate /etc/logrotate.d
+RUN         cp etc.bind/* /etc/bind
+
+WORKDIR     /tmp
+RUN         rm -rf /tmp/self
