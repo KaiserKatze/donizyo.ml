@@ -57,8 +57,16 @@ RUN         git clone --verbose \
                 --no-tags \
                 -- "$GIT_SELF" self
 WORKDIR     /tmp/self/bind/.config
-RUN         cp bind.logrotate /etc/logrotate.d
-RUN         cp etc.bind/* /etc/bind
+RUN         cp bind.logrotate /etc/logrotate.d/bind && \
+            chmod 644 /etc/logrotate.d/bind && \
+            chown root:root /etc/logrotate.d/bind
+RUN         cp etc.bind/* /etc/bind && \
+            chmod 644 /etc/bind/* && \
+            chmod 2755 /etc/bind /etc/bind/zones && \
+            chown -R bind:bind /etc/bind
+RUN         mkdir -p /var/cache/bind && \
+            chmod 2755 /var/cache/bind && \
+            chown bind:bind /var/cache/bind
 
 WORKDIR     /tmp
 RUN         rm -rf /tmp/self
