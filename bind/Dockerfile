@@ -60,7 +60,7 @@ WORKDIR     /tmp/self/bind/.config
 RUN         cp bind.logrotate /etc/logrotate.d/bind && \
             chmod 644 /etc/logrotate.d/bind && \
             chown root:root /etc/logrotate.d/bind
-RUN         cp etc.bind/* /etc/bind && \
+RUN         cp -r etc.bind/* /etc/bind && \
             chmod 644 /etc/bind/* && \
             chmod 2755 /etc/bind /etc/bind/zones && \
             chown -R bind:bind /etc/bind
