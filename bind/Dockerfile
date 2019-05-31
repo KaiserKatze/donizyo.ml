@@ -42,8 +42,7 @@ WORKDIR     $PATH_APP
 RUN         rm -rf bind9
 
 # configuration
-RUN         find / -name 'useradd'
-RUN         uesradd -M -s /usr/sbin/nologin bind
+RUN         useradd -M -s /usr/sbin/nologin bind
 
 WORKDIR     /etc/bind
 # @see: https://www.isc.org/downloads/bind/bind-keys/
