@@ -21,13 +21,24 @@ pull() {
     repo=$DOCKER_USERNAME/$image
     docker pull $repo:$version
     docker tag  $repo:$version  $image
+    docker tag  $repo:$version  $image:$version
     docker rmi  $repo:$version
+}
+
+check_dep() {
+    image=$1
+    dep=${image_dep["$image"]}
+    if [ -n "$dep" ]; then
+        dep_ver=${image_ver["$dep"]}
+        docker images $dep:$dep_ver || exit 1
+    fi
 }
 
 build() {
     image=$1
     version=$2
     repo=$DOCKER_USERNAME/$image
+    check_dep $image
     docker build -t $image ./$image
     docker tag  $image  $repo:$version
     docker push         $repo:$version
