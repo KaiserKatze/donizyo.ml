@@ -1,5 +1,12 @@
 #!/bin/bash
 
+onerror() {
+    echo "Fail to execute: $0 $@"
+    exit 1
+}
+# exit 1 on error
+trap onerror ERR
+
 # Image dependencies
 # supported by bash 4
 declare -A image_dep=( ["bind"]="python" ["python"]="sqlite" ["sqlite"]="openssl" ["openssl"]="" )
