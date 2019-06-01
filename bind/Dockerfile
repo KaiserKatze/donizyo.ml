@@ -69,9 +69,13 @@ RUN         chmod 2755 /etc/bind && \
 RUN         mkdir -p /var/cache/bind && \
             chmod 2755 /var/cache/bind && \
             chown bind:bind /var/cache/bind
+RUN         mkdir -p /var/log/bind && \
+            chmod 2755 /var/log/bind && \
+            chown bind:bind /var/log/bind
 
 WORKDIR     /tmp
 RUN         rm -rf /tmp/self
 
 # bind test
 RUN         named -V
+RUN         named-checkconf
