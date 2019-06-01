@@ -52,3 +52,25 @@ build_only() {
         build $image ${image_ver["$image"]}
     done
 }
+
+case "$1" in
+    all)
+    build_all
+    ;;
+
+    only)
+    build_only "$2"
+    ;;
+
+    pull)
+    pull
+    ;;
+
+    *)
+    echo "Usage: $0 {all|pull}"
+    echo "       $0 only <image>"
+    exit 1
+    ;;
+esac
+
+exit 0
