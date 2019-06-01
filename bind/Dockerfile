@@ -77,8 +77,8 @@ WORKDIR     /tmp
 RUN         rm -rf /tmp/self
 
 # bind test
-RUN         named -V
-RUN         named-checkconf
-RUN         named-checkconf -z
-RUN         named-checkconf -xp
+RUN         named -V || echo "Fail to compile BIND9!"
+RUN         named-checkconf || echo "Invalid BIND9 configuration file!"
+RUN         named-checkconf -z || echo "Invalid BIND9 configuration file!"
+RUN         named-checkconf -xp || echo "Invalid BIND9 configuration file!"
 # Use `named-checkzone` to check newly added authoritative answers
