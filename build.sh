@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -E
 onerror() {
     echo "Fail to execute: $0 $@"
     exit 1
@@ -14,7 +13,6 @@ declare -A image_dep=( ["bind"]="python" ["python"]="sqlite" ["sqlite"]="openssl
 declare -A image_ver=( ["bind"]="9.14.2" ["python"]="3.7.3" ["sqlite"]="3.28.0" ["openssl"]="1.1.0k" )
 
 pull() {
-    trap ERR
     image=$1
     version=$2
     if [ -z "$image" ]; then exit 1; fi
@@ -26,7 +24,6 @@ pull() {
 }
 
 build() {
-    trap ERR
     image=$1
     version=$2
     repo=$DOCKER_USERNAME/$image
@@ -38,12 +35,10 @@ build() {
 }
 
 build_base() {
-    trap ERR
     docker build -t base ./base
 }
 
 build_all() {
-    trap ERR
     build_base
     build openssl   1.1.0k
     build sqlite    3.28.0
@@ -52,7 +47,6 @@ build_all() {
 }
 
 build_only() {
-    trap ERR
     image=$1
     if [ -z "$image" ]; then exit 1; fi
     iter=${image_dep["$image"]}
@@ -69,7 +63,6 @@ build_only() {
 }
 
 push() {
-    trap ERR
     image=$1
     version=$2
     repo=$DOCKER_USERNAME/$image
@@ -80,7 +73,6 @@ push() {
 }
 
 push_all() {
-    trap ERR
     list=$(docker images | awk 'NR>1' | cut -d' ' -f1)
     for image in $list; do
         push $image ${image_ver["$image"]}
