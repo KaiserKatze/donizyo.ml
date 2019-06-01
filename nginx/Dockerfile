@@ -51,3 +51,25 @@ RUN         cd "nginx" && \
 RUN         cd "nginx" && \
             make clean && \
             rm -f "$PATH_APP/nginx.tar.gz"
+
+# configuration
+WORKDIR     /tmp
+ARG         GIT_SELF=https://github.com/donizyo/donizyo.ml.git
+RUN         git clone --verbose \
+                --depth 1 \
+                --single-branch \
+                --branch master \
+                -- "$GIT_SELF" self
+WORKDIR     /tmp/self/nginx
+
+RUN         mkdir -p /etc/nginx && \
+            chmod 2755 /etc/nginx && \
+            chown root:root /etc/nginx && \
+            cp -r .config/* /
+
+WORKDIR     /tmp
+RUN         rm -rf /tmp/self
+
+# nginx test
+RUN         nginx -V || echo "Fail to compile Nginx!"
+RUN         nginx -T || echo "Invalid Nginx configuration file!"
