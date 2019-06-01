@@ -79,3 +79,6 @@ RUN         rm -rf /tmp/self
 # bind test
 RUN         named -V
 RUN         named-checkconf
+RUN         named-checkconf -z
+RUN         named-checkconf -xp
+# Use `named-checkzone` to check newly added authoritative answers
