@@ -35,7 +35,7 @@ RUN         test -d "$PATH_PYTHON_PACKAGES" && \
                 --with-gssapi \
                 --with-gnu-ld \
                 --enable-full-report
-RUN         make -j4
+RUN         make
 RUN         make install
 
 WORKDIR     $PATH_APP
