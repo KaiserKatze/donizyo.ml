@@ -12,7 +12,6 @@ RUN         git clone --verbose \
                 --depth 1 \
                 --single-branch \
                 --branch "$VERSION_BIND" \
-                --no-tags \
                 -- "$GIT_BIND9" bind9
 RUN         python -m pip install ply && \
             apt-get -y install libjson-c-dev libkrb5-dev libcap-dev
@@ -54,7 +53,6 @@ RUN         git clone --verbose \
                 --depth 1 \
                 --single-branch \
                 --branch master \
-                --no-tags \
                 -- "$GIT_SELF" self
 WORKDIR     /tmp/self/bind
 

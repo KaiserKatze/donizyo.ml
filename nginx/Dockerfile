@@ -32,7 +32,6 @@ RUN         curl -sL "$URL_NGINX_TARBALL" -o nginx.tar.gz && \
                 --depth 1 \
                 --single-branch \
                 --branch "$VERSION_NGINX_RTMP_MODULE" \
-                --no-tags \
                 -- "$GIT_NGINX_RTMP_MODULE" nginx-rtmp-module
 RUN         cd "nginx" && \
             ./configure --user=www-data --group=www-data \

@@ -13,7 +13,6 @@ RUN         git clone --verbose \
                 --depth 1 \
                 --single-branch \
                 --branch "$VERSION_OPENSSL" \
-                --no-tags \
                 -- "$GIT_OPENSSL" openssl
 WORKDIR     $PATH_APP/openssl
 RUN         ./config \
