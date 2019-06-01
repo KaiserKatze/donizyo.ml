@@ -70,7 +70,7 @@ build_only() {
     done
     build_base
     for image in $list; do
-        build $image ${image_ver["$image"]} || exit 1
+        build $image ${image_ver["$image"]}
     done
 }
 
