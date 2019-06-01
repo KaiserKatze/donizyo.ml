@@ -2,7 +2,7 @@
 
 set -Ee
 onerror() {
-    echo "Fail to execute: $0 $@"
+    echo "Fail to execute: $0 $@ ($?)"
     exit 1
 }
 # exit 1 on error
