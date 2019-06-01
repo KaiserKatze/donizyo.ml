@@ -55,9 +55,26 @@ build_only() {
     done
 }
 
+push() {
+    image=$1
+    version=$2
+    repo=$DOCKER_USERNAME/$image
+    docker tag  $image  $repo:$version
+    docker push         $repo:$version
+    docker tag  $image  $repo
+    docker push         $repo
+}
+
+push_all() {
+    list=$(docker images | awk 'NR>1' | cut -d' ' -f1)
+    for image in $list; do
+        push $image ${image_ver["$image"]}
+    done
+}
+
 case "$1" in
     all)
-    build_all
+    build_all && push_all
     ;;
 
     only)
@@ -68,9 +85,14 @@ case "$1" in
     pull "$2" "$3"
     ;;
 
+    push)
+    push "$2" "$3"
+    ;;
+
     *)
     echo "Usage: $0 all"
     echo "       $0 only <image>"
+    echo "       $0 push <image> [version]"
     echo "       $0 pull <image> [version]"
     exit 1
     ;;
