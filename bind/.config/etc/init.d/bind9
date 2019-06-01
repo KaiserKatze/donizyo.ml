@@ -28,12 +28,7 @@ test -x /usr/sbin/rndc || exit 0
 PIDFILE=/run/named/named.pid
 
 check_network() {
-    if [ -x /usr/bin/uname ] && [ "X$(/usr/bin/uname -o)" = XSolaris ]; then
-	IFCONFIG_OPTS="-au"
-    else
-	IFCONFIG_OPTS=""
-    fi
-    if [ -z "$(/sbin/ifconfig $IFCONFIG_OPTS)" ]; then
+    if [ -z "$(/sbin/ip a)" ]; then
        #log_action_msg "No networks configured."
        return 1
     fi
@@ -129,7 +124,7 @@ case "$1" in
 	$0 stop
 	$0 start
     ;;
-    
+
     status)
     	ret=0
 	status_of_proc -p ${PIDFILE} /usr/sbin/named bind9 2>/dev/null || ret=$?
