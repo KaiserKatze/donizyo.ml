@@ -72,6 +72,7 @@ RUN         mkdir -p /var/cache/bind && \
 RUN         mkdir -p /var/log/bind && \
             chmod 2755 /var/log/bind && \
             chown bind:bind /var/log/bind
+RUN         chmod 755 /etc/init.d/bind9
 
 WORKDIR     /tmp
 RUN         rm -rf /tmp/self
