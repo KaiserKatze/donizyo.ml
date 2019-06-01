@@ -15,6 +15,6 @@ logging {
         print-time yes;
     };
 
-    category default { b_default };
+    category default { b_default; };
     category queries { b_query; };
 };
