@@ -9,7 +9,7 @@ logging {
         severity info;
     };
     channel b_default {
-        file "/var/log/bind/default.log" version 3 size 5m;
+        file "/var/log/bind/default.log" versions 3 size 5m;
         print-category yes;
         print-severity yes;
         print-time yes;
