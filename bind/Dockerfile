@@ -70,7 +70,12 @@ RUN         mkdir -p /var/cache/bind && \
             chown bind:bind /var/cache/bind
 RUN         mkdir -p /var/log/bind && \
             chmod 2755 /var/log/bind && \
-            chown bind:bind /var/log/bind
+            chown bind:bind /var/log/bind && \
+            cd /var/log/bind && \
+            touch query.log && \
+            touch default.log && \
+            chmod 644 *.log && \
+            chown bind:bind *.log
 RUN         chmod 755 /etc/init.d/bind9
 
 WORKDIR     /tmp
