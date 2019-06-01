@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -E
+set -Ee
 onerror() {
     echo "Fail to execute: $0 $@"
     exit 1
