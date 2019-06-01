@@ -6,8 +6,6 @@ LABEL       image=python:3.7.3
 ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
 ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
 ARG         LD_RUN_PATH=$LD_LIBRARY_PATH
-#
-ARG         OPTIONAL_PYTHON_CONFIG=--enable-optimizations
 
 RUN         apt-get -y install libffi-dev
 
@@ -22,7 +20,7 @@ RUN         ./configure \
                 --enable-shared \
                 --with-lto \
                 --with-openssl="$OPENSSL_PREFIX" \
-                "$OPTIONAL_PYTHON_CONFIG"
+                --enable-optimizations
 RUN         make -j4
 RUN         make install
 
