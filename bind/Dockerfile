@@ -42,7 +42,7 @@ WORKDIR     $PATH_APP
 RUN         rm -rf bind9
 
 # configuration
-RUN         useradd -M -s /usr/sbin/nologin bind
+RUN         useradd -M -d /nonexistent -s /usr/sbin/nologin bind
 
 WORKDIR     /etc/bind
 # @see: https://www.isc.org/downloads/bind/bind-keys/
@@ -56,16 +56,16 @@ RUN         git clone --verbose \
                 --branch master \
                 --no-tags \
                 -- "$GIT_SELF" self
-WORKDIR     /tmp/self/bind/.config
-RUN         cp bind.logrotate /etc/logrotate.d/bind && \
-            chmod 644 /etc/logrotate.d/bind && \
+WORKDIR     /tmp/self/bind
+
+RUN         cp -r .config/* /
+RUN         chmod 644 /etc/logrotate.d/bind && \
             chown root:root /etc/logrotate.d/bind
-RUN         cp -r etc.bind/* /etc/bind && \
+RUN         chmod 2755 /etc/bind && \
+            chown -R bind:bind /etc/bind && \
             chmod 644 /etc/bind/* && \
-            chmod 2755 /etc/bind && \
             mkdir -p /etc/bind/zones && \
-            chmod 2755 /etc/bind/zones && \
-            chown -R bind:bind /etc/bind
+            chmod 2755 /etc/bind/zones
 RUN         mkdir -p /var/cache/bind && \
             chmod 2755 /var/cache/bind && \
             chown bind:bind /var/cache/bind
@@ -75,4 +75,3 @@ RUN         rm -rf /tmp/self
 
 # bind test
 RUN         named -V
-RUN         named -g
