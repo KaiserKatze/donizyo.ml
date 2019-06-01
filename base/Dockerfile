@@ -19,9 +19,6 @@ RUN         apt-get -y install iproute2
 # Install editor
 RUN         apt-get -y install vim
 
-# test installed packages
-RUN         which git && git version && exit 1
-
 # install python2.7 on ubuntu:18.04(debian:buster)
 ARG         APT_SOURCELIST=/etc/apt/sources.list
 RUN         echo "deb http://ftp.de.debian.org/debian buster main" >> $APT_SOURCELIST
