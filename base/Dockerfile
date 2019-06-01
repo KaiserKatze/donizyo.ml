@@ -15,7 +15,9 @@ RUN         echo "Installing necessary packages:" && \
             apt-get -y install curl tar git && \
             apt-get -y install build-essential
 # Install `ip`
-RUN         apt-get -y install iproute
+RUN         apt-get -y install iproute2
+# Install editor
+RUN         apt-get -y install vim
 
 # install python2.7 on ubuntu:18.04(debian:buster)
 ARG         APT_SOURCELIST=/etc/apt/sources.list

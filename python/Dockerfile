@@ -6,8 +6,8 @@ LABEL       image=python:3.7.3
 ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
 ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
 ARG         LD_RUN_PATH=$LD_LIBRARY_PATH
-# --enable-optimizations
-ARG         OPTIONAL_PYTHON_CONFIG=
+#
+ARG         OPTIONAL_PYTHON_CONFIG=--enable-optimizations
 
 RUN         apt-get -y install libffi-dev
 
@@ -24,11 +24,6 @@ RUN         ./configure \
                 --with-openssl="$OPENSSL_PREFIX" \
                 "$OPTIONAL_PYTHON_CONFIG"
 RUN         make -j4
-
-#RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -E -S -m sysconfig --generate-posix-vars
-#RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -E setup.py build
-#RUN         /lib64/ld-linux-x86-64.so.2 --library-path $PATH_APP/python $PATH_APP/python/python -m test.pythoninfo
-
 RUN         make install
 
 WORKDIR     $PATH_APP
