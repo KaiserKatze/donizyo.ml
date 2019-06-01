@@ -8,6 +8,8 @@ declare -A image_ver=( ["bind"]="9.14.2" ["python"]="3.7.3" ["sqlite"]="3.28.0" 
 pull() {
     image=$1
     version=$2
+    if [ -z "$image" ]; then return; fi
+    if [ -z "$version" ]; then version="latest"; fi
     repo=$DOCKER_USERNAME/$image
     docker pull $repo:$version
     docker tag  $repo:$version  $image
@@ -63,12 +65,13 @@ case "$1" in
     ;;
 
     pull)
-    pull
+    pull "$2" "$3"
     ;;
 
     *)
-    echo "Usage: $0 {all|pull}"
+    echo "Usage: $0 all"
     echo "       $0 only <image>"
+    echo "       $0 pull <image> [version]"
     exit 1
     ;;
 esac
