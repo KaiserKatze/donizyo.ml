@@ -34,6 +34,7 @@ RUN         test -d "$PATH_PYTHON_PACKAGES" && \
                 --with-gssapi \
                 --with-gnu-ld \
                 --enable-full-report
+# don't use parallel jobs (-j) when making BIND9
 RUN         make
 RUN         make install
 
