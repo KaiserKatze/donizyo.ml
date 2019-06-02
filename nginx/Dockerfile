@@ -17,24 +17,27 @@ ARG         PCRE_PREFIX=/usr/local
 # pcre
 RUN         curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
             tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
-RUN         cd "pcre" && \
-            ./configure --prefix="$PCRE_PREFIX" && \
-            make && \
-            make install
-RUN         cd "pcre" && \
-            make clean && \
-            rm -f "$PATH_APP/pcre.tar.gz"
+WORKDIR     $PATH_APP/pcre
+RUN         ./configure --prefix="$PCRE_PREFIX"
+RUN         make
+RUN         make install
+WORKDIR     $PATH_APP
+RUN         rm -rf pcre pcre.tar.gz
+
+
 # nginx
 RUN         curl -sL "$URL_NGINX_TARBALL" -o nginx.tar.gz && \
-            tar -xf nginx.tar.gz --one-top-level=nginx --strip-components 1 && \
-            cd "nginx" && \
-            git clone --verbose \
+            tar -xf nginx.tar.gz --one-top-level=nginx --strip-components 1
+WORKDIR     $PATH_APP/nginx
+
+# nginx modules
+RUN         git clone --verbose \
                 --depth 1 \
                 --single-branch \
                 --branch "$VERSION_NGINX_RTMP_MODULE" \
                 -- "$GIT_NGINX_RTMP_MODULE" nginx-rtmp-module
-RUN         cd "nginx" && \
-            ./configure --user=www-data --group=www-data \
+
+RUN         ./configure --user=www-data --group=www-data \
                 --prefix=/usr/local/nginx \
                 --with-threads \
                 --with-file-aio \
@@ -45,12 +48,11 @@ RUN         cd "nginx" && \
                 --with-openssl="$PATH_APP/openssl" \
                 --with-pcre="$PATH_APP/pcre" \
                 --with-zlib="$PATH_APP/zlib" \
-                --add-module="$PATH_APP/nginx/nginx-rtmp-module" && \
-            make && \
-            make install
-RUN         cd "nginx" && \
-            make clean && \
-            rm -f "$PATH_APP/nginx.tar.gz"
+                --add-module="$PATH_APP/nginx/nginx-rtmp-module"
+RUN         make
+RUN         make install
+WORKDIR     $PATH_APP
+RUN         rm -f nginx nginx.tar.gz
 
 # configuration
 WORKDIR     /tmp
@@ -73,3 +75,5 @@ RUN         rm -rf /tmp/self
 # nginx test
 RUN         nginx -V || echo "Fail to compile Nginx!"
 RUN         nginx -T || echo "Invalid Nginx configuration file!"
+
+WORKDIR     $PATH_APP
