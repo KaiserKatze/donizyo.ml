@@ -9,8 +9,8 @@ EXPOSE      443/tcp
 EXPOSE      1935/tcp
 
 ARG         URL_PCRE_TARBALL=https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
-ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
-ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
+ARG         URL_ZLIB_TARBALL=https://www.zlib.net/zlib-1.2.11.tar.gz
+ARG         URL_NGINX_TARBALL=https://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
 ARG         PCRE_PREFIX=/usr/local
