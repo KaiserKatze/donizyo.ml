@@ -9,7 +9,7 @@ RUN         curl -sL "$URL_SQLITE_TARBALL" -o sqlite.tar.gz && \
             tar -xf sqlite.tar.gz --one-top-level=sqlite --strip-components 1
 WORKDIR     $PATH_APP/sqlite
 RUN         ./configure --prefix="$SQLITE_PREFIX"
-RUN         make -j4
+RUN         make
 RUN         make install
 
 # @see: [How SQLite Is Tested](https://www.sqlite.org/testing.html)

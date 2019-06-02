@@ -21,7 +21,7 @@ RUN         ./configure \
                 --with-lto \
                 --with-openssl="$OPENSSL_PREFIX" \
                 --enable-optimizations
-RUN         make -j4
+RUN         make
 RUN         make install
 
 WORKDIR     $PATH_APP
