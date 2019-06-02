@@ -25,7 +25,7 @@ RUN         make
 RUN         make install
 
 WORKDIR     $PATH_APP
-RUN         rm -rf pcre pcre.tar.gz
+RUN         rm -rf pcre.tar.gz
 
 # zlib
 RUN         curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
@@ -36,7 +36,7 @@ RUN         make
 RUN         make install
 
 WORKDIR     $PATH_APP
-RUN         rm -rf zlib zlib.tar.gz
+RUN         rm -rf zlib.tar.gz
 
 
 # nginx
@@ -71,7 +71,7 @@ RUN         make
 RUN         make install
 
 WORKDIR     $PATH_APP
-RUN         rm -rf nginx nginx.tar.gz
+RUN         rm -rf pcre zlib nginx nginx.tar.gz
 
 # configuration
 WORKDIR     /tmp
