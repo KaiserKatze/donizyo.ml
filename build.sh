@@ -112,6 +112,10 @@ case "$1" in
     push "$2" "$3"
     ;;
 
+    easy)
+    easy
+    ;;
+
     *)
     echo "Usage: $0 all"
     echo "       $0 only <image>"
