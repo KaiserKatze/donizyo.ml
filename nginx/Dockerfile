@@ -19,7 +19,7 @@ RUN         curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
             tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
 WORKDIR     $PATH_APP/pcre
 RUN         ./configure --prefix="$PCRE_PREFIX"
-RUN         make
+RUN         make -j4
 RUN         make install
 WORKDIR     $PATH_APP
 RUN         rm -rf pcre pcre.tar.gz
@@ -49,7 +49,7 @@ RUN         ./configure --user=www-data --group=www-data \
                 --with-pcre="$PATH_APP/pcre" \
                 --with-zlib="$PATH_APP/zlib" \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module"
-RUN         make
+RUN         make -j4
 RUN         make install
 WORKDIR     $PATH_APP
 RUN         rm -f nginx nginx.tar.gz
