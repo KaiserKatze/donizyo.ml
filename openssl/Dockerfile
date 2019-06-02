@@ -26,6 +26,6 @@ RUN         make install
 RUN         echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $URI_ENVVAR
 
 WORKDIR     $PATH_APP
-RUN         rm -rf openssl openssl.tar.gz
+RUN         rm -rf openssl.tar.gz
 # openssl test
 RUN         openssl version

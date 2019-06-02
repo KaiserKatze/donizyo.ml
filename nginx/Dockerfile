@@ -21,6 +21,7 @@ WORKDIR     $PATH_APP/pcre
 RUN         ./configure --prefix="$PCRE_PREFIX"
 RUN         make -j4
 RUN         make install
+
 WORKDIR     $PATH_APP
 RUN         rm -rf pcre pcre.tar.gz
 
@@ -37,6 +38,8 @@ RUN         git clone --verbose \
                 --branch "$VERSION_NGINX_RTMP_MODULE" \
                 -- "$GIT_NGINX_RTMP_MODULE" nginx-rtmp-module
 
+# @see: http://nginx.org/en/docs/configure.html
+# compile --without-http_gzip_module, thus need not --with-zlib
 RUN         ./configure --user=www-data --group=www-data \
                 --prefix=/usr/local/nginx \
                 --with-threads \
@@ -46,13 +49,14 @@ RUN         ./configure --user=www-data --group=www-data \
                 --with-http_realip_module \
                 --with-http_stub_status_module \
                 --with-openssl="$PATH_APP/openssl" \
-                --with-pcre="$PATH_APP/pcre" \
-                --with-zlib="$PATH_APP/zlib" \
+                --with-pcre \
+                --without-http_gzip_module \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module"
 RUN         make -j4
 RUN         make install
+
 WORKDIR     $PATH_APP
-RUN         rm -f nginx nginx.tar.gz
+RUN         rm -rf nginx nginx.tar.gz
 
 # configuration
 WORKDIR     /tmp
