@@ -9,21 +9,34 @@ EXPOSE      443/tcp
 EXPOSE      1935/tcp
 
 ARG         URL_PCRE_TARBALL=https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
+ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
 ARG         PCRE_PREFIX=/usr/local
+ARG         ZLIB_PREFIX=/usr/local
 
 # pcre
 RUN         curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
             tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
 WORKDIR     $PATH_APP/pcre
 RUN         ./configure --prefix="$PCRE_PREFIX"
-RUN         make -j4
+RUN         make
 RUN         make install
 
 WORKDIR     $PATH_APP
 RUN         rm -rf pcre pcre.tar.gz
+
+# zlib
+RUN         curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
+            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
+WORKDIR     $PATH_APP/zlib
+RUN         ./configure --prefix="$ZLIB_PREFIX"
+RUN         make
+RUN         make install
+
+WORKDIR     $PATH_APP
+RUN         rm -rf zlib zlib.tar.gz
 
 
 # nginx
@@ -50,10 +63,11 @@ RUN         ./configure --user=www-data --group=www-data \
                 --with-http_realip_module \
                 --with-http_stub_status_module \
                 --with-openssl="$PATH_APP/openssl" \
-                --with-pcre \
+                --with-pcre="$PATH_APP/pcre" \
+                --with-zlib="$PATH_APP/zlib" \
                 --without-http_gzip_module \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module"
-RUN         make -j4
+RUN         make
 RUN         make install
 
 WORKDIR     $PATH_APP
