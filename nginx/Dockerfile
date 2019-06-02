@@ -39,7 +39,8 @@ RUN         git clone --verbose \
                 -- "$GIT_NGINX_RTMP_MODULE" nginx-rtmp-module
 
 # @see: http://nginx.org/en/docs/configure.html
-# compile --without-http_gzip_module, thus need not --with-zlib
+# compile --without-http_gzip_module, thus need not --with-zlib,
+# because `gzip on` is not secure when using with `ssl`
 RUN         ./configure --user=www-data --group=www-data \
                 --prefix=/usr/local/nginx \
                 --with-threads \
