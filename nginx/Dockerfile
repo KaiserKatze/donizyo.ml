@@ -55,9 +55,21 @@ RUN         git clone --verbose \
 # compile --without-http_gzip_module, thus need not --with-zlib,
 # because `gzip on` is not secure when using with `ssl`
 RUN         ./configure --user=www-data --group=www-data \
-                --prefix=/usr/local/nginx \
+                --prefix=/usr/share/nginx \
+                --conf-path=/etc/nginx/nginx.conf \
+                --http-log-path=/var/log/nginx/access.log \
+                --error-log-path=/var/log/nginx/error.log \
+                --lock-path=/var/lock/nginx.lock \
+                --pid-path=/run/nginx.pid \
+                --modules-path=/usr/lib/nginx/modules \
+                --http-client-body-temp-path=/var/lib/nginx/body \
+                --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+                --http-proxy-temp-path=/var/lib/nginx/proxy \
+                --http-scgi-temp-path=/var/lib/nginx/scgi \
+                --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
                 --with-threads \
                 --with-file-aio \
+                --with-ipv6 \
                 --with-http_ssl_module \
                 --with-http_v2_module \
                 --with-http_realip_module \
