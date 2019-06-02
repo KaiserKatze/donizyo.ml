@@ -56,6 +56,7 @@ RUN         git clone --verbose \
 # because `gzip on` is not secure when using with `ssl`
 RUN         ./configure --user=www-data --group=www-data \
                 --prefix=/usr/share/nginx \
+                --sbin-path=/usr/sbin \
                 --conf-path=/etc/nginx/nginx.conf \
                 --http-log-path=/var/log/nginx/access.log \
                 --error-log-path=/var/log/nginx/error.log \
