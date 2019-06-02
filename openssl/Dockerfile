@@ -23,6 +23,7 @@ RUN         ./config \
 RUN         make -j4
 RUN         make -j4 test
 RUN         make install
+RUN         make clean
 RUN         echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $URI_ENVVAR
 
 WORKDIR     $PATH_APP
