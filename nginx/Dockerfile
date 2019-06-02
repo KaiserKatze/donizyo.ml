@@ -9,20 +9,34 @@ EXPOSE      443/tcp
 EXPOSE      1935/tcp
 
 ARG         URL_PCRE_TARBALL=https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
+ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
 ARG         URL_NGINX_TARBALL=http://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
 ARG         PCRE_PREFIX=/usr/local
+ARG         ZLIB_PREFIX=/usr/local
 
 # pcre
 RUN         curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
             tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
 WORKDIR     $PATH_APP/pcre
 RUN         ./configure --prefix="$PCRE_PREFIX"
-RUN         make -j4
+RUN         make
 RUN         make install
+
 WORKDIR     $PATH_APP
-RUN         rm -rf pcre pcre.tar.gz
+RUN         rm -rf pcre.tar.gz
+
+# zlib
+RUN         curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
+            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
+WORKDIR     $PATH_APP/zlib
+RUN         ./configure --prefix="$ZLIB_PREFIX"
+RUN         make
+RUN         make install
+
+WORKDIR     $PATH_APP
+RUN         rm -rf zlib.tar.gz
 
 
 # nginx
@@ -37,10 +51,26 @@ RUN         git clone --verbose \
                 --branch "$VERSION_NGINX_RTMP_MODULE" \
                 -- "$GIT_NGINX_RTMP_MODULE" nginx-rtmp-module
 
+# @see: http://nginx.org/en/docs/configure.html
+# compile --without-http_gzip_module, thus need not --with-zlib,
+# because `gzip on` is not secure when using with `ssl`
 RUN         ./configure --user=www-data --group=www-data \
-                --prefix=/usr/local/nginx \
+                --prefix=/usr/share/nginx \
+                --sbin-path=/usr/sbin \
+                --conf-path=/etc/nginx/nginx.conf \
+                --http-log-path=/var/log/nginx/access.log \
+                --error-log-path=/var/log/nginx/error.log \
+                --lock-path=/var/lock/nginx.lock \
+                --pid-path=/run/nginx.pid \
+                --modules-path=/usr/lib/nginx/modules \
+                --http-client-body-temp-path=/var/lib/nginx/body \
+                --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+                --http-proxy-temp-path=/var/lib/nginx/proxy \
+                --http-scgi-temp-path=/var/lib/nginx/scgi \
+                --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
                 --with-threads \
                 --with-file-aio \
+                --with-ipv6 \
                 --with-http_ssl_module \
                 --with-http_v2_module \
                 --with-http_realip_module \
@@ -48,11 +78,13 @@ RUN         ./configure --user=www-data --group=www-data \
                 --with-openssl="$PATH_APP/openssl" \
                 --with-pcre="$PATH_APP/pcre" \
                 --with-zlib="$PATH_APP/zlib" \
+                --without-http_gzip_module \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module"
-RUN         make -j4
+RUN         make
 RUN         make install
+
 WORKDIR     $PATH_APP
-RUN         rm -f nginx nginx.tar.gz
+RUN         rm -rf pcre zlib nginx nginx.tar.gz
 
 # configuration
 WORKDIR     /tmp

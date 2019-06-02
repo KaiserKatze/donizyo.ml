@@ -24,14 +24,3 @@ ARG         APT_SOURCELIST=/etc/apt/sources.list
 RUN         echo "deb http://ftp.de.debian.org/debian buster main" >> $APT_SOURCELIST
 RUN         apt-get -y install python2.7
 RUN         update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
-
-# zlib
-ARG         URL_ZLIB_TARBALL=http://www.zlib.net/zlib-1.2.11.tar.gz
-
-RUN         curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
-            tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
-RUN         cd "$PATH_APP/zlib" && \
-            ./configure && \
-            make && \
-            make install
-RUN         rm -rf "$PATH_APP/zlib" "$PATH_APP/zlib.tar.gz"
