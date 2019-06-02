@@ -91,6 +91,10 @@ push_all() {
     done
 }
 
+easy() {
+    cat .travis.yml | grep -P '^\s+- docker \w+' | awk 'BEGIN{print "git pull && \\"}{print "\t" substr($0,5) " && \\"}END{print "\tdocker rmi $(docker images -f dangling=true -q)"}' | bash
+}
+
 case "$1" in
     all)
     build_all && push_all
