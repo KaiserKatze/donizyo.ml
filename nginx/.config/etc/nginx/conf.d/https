@@ -1,0 +1,25 @@
+# Context: server
+
+# to properly activate HTTPS feature:
+# 1. modify `ssl_certificate`, `ssl_certificate_key` and `ssl_trusted_certificate`
+# 2. rename this file to `https.conf`
+
+# inform browser this server accepts only HTTPS requests
+# arguments:
+#  * max-age                lifecycle in seconds, for example:
+#                           max-age=86400        effective for a day
+#                           max-age=604800       effective for a week
+#                           max-age=31536000     effective for a year
+#  * includeSubdomains      include sub-domains
+add_header Strict-Transport-Security "max-age=3600; includeSubdomains" always;
+
+ssl_certificate         /path/to/fullchain.pem;
+ssl_certificate_key     /path/to/privkey.pem;
+ssl_session_timeout     1h;
+ssl_session_cache       shared:SSL:50m;
+ssl_session_tickets     off;
+# OCSP Stapling
+ssl_stapling            on;
+ssl_stapling_verify     on;
+#ssl_trusted_certificate /path/to/fullchain.pem;
+resolver                8.8.8.8 8.8.4.4 80.80.80.80 80.80.81.81 ipv6=off;

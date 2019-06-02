@@ -1,42 +1,41 @@
-# Compile and Install Python
-# @see: https://github.com/docker-library/python/blob/34c9df35e9a69e9f0edde88e861b543edb8bc07a/3.7/stretch/Dockerfile
+# @see: https://cpython-devguide.readthedocs.io/setup/#build-dependencies
 
-FROM        openssl:1.1.1b AS base
-LABEL       maintainer.name="KaiserKatze" \
-            maintainer.mail="donizyo@gmail.com"
-WORKDIR     /tmp/workdir
+FROM        sqlite AS python
+LABEL       image=python:3.7.3
 
-ARG         PATH_APP=/root/App
-ARG         URL_SQLITE_TARBALL=https://www.sqlite.org/2019/sqlite-autoconf-3280000.tar.gz
 ARG         URL_PYTHON_TARBALL=https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
-ARG         SQLITE_PREFIX=/usr/local/sqlite
+ENV         PATH_PYTHON_PACKAGES="/usr/local/lib/python3.7/site-packages"
+ARG         LD_RUN_PATH=$LD_LIBRARY_PATH
 
-# sqlite
-RUN         cd "$PATH_APP" && \
-            curl -sL "$URL_SQLITE_TARBALL" -o sqlite.tar.gz && \
-            tar -xf sqlite.tar.gz --one-top-level=sqlite --strip-components 1 && \
-            cd "$PATH_APP/sqlite" && \
-            ./configure --prefix="$SQLITE_PREFIX" && \
-            make && \
-            make install && \
-            make clean > /dev/null
+RUN         apt-get -y install libffi-dev
+
 # python
-RUN         cd "$PATH_APP" && \
-            curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
-            tar -xf python.tar.xz --one-top-level=python --strip-components 1 &&  \
-            cd "$PATH_APP/python" && \
-            ./configure \
-                --enable-loadable-sqlite-extensions \
-                --enable-ipv6 \
-                --enable-shared \
-                --enable-profiling \
-                --enable-optimizations \
-                --with-lto \
-                --with-ssl-default-suites=python && \
-            make && \
-            make install  && \
-            make clean > /dev/null && \
-            cat "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
-            update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 1 && \
-            python -m pip --upgrade pip
+RUN         curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
+            tar -xf python.tar.xz --one-top-level=python --strip-components 1
 
+WORKDIR     $PATH_APP/python
+RUN         ./configure \
+                --enable-ipv6 \
+                --enable-profiling \
+                --enable-shared \
+                --with-lto \
+                --with-openssl="$OPENSSL_PREFIX" \
+                --enable-optimizations
+RUN         make -j4
+RUN         make install
+
+WORKDIR     $PATH_APP
+RUN         rm -rf python python.tar.xz
+
+RUN         echo "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
+            update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 10
+# manually check update-alternatives
+RUN         update-alternatives --display python
+
+# python test
+RUN         python -V
+RUN         python -c "import ssl"
+RUN         python -c "import sqlite3"
+
+# upgrade pip - package manager
+RUN         python -m pip install --upgrade pip
