@@ -10,7 +10,7 @@ trap onerror ERR
 
 # Image dependencies
 # supported by bash 4
-declare -A image_dep=( ["bind"]="python" ["python"]="sqlite" ["sqlite"]="openssl" ["openssl"]="" )
+declare -A image_dep=( ["bind"]="python" ["python"]="sqlite" ["sqlite"]="" )
 
 pull() {
     image=$1

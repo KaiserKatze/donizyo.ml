@@ -9,14 +9,13 @@ before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 script:
   - docker build -t base ./base
-  - docker build -t openssl ./openssl
+  - docker build -t util ./util
   - docker build -t nginx ./nginx
   - docker build -t sqlite ./python/sqlite
   - docker build -t python ./python
   - docker build -t bind ./bind
   - docker images
 after_success:
-  - docker tag openssl $DOCKER_USERNAME/openssl && docker push $DOCKER_USERNAME/openssl
   - docker tag nginx $DOCKER_USERNAME/nginx && docker push $DOCKER_USERNAME/nginx
   - docker tag sqlite $DOCKER_USERNAME/sqlite && docker push $DOCKER_USERNAME/sqlite
   - docker tag python $DOCKER_USERNAME/python && docker push $DOCKER_USERNAME/python
