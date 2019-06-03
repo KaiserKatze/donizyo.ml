@@ -12,6 +12,7 @@ ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
 
 # nginx
+WORKDIR     $PATH_APP
 RUN         curl -sL $URL_NGINX_TARBALL -o nginx.tar.gz && \
             tar -xf nginx.tar.gz --one-top-level=nginx --strip-components 1
 WORKDIR     $PATH_APP/nginx
