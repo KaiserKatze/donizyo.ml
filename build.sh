@@ -75,12 +75,14 @@ easy() {
         # no username is provided
         echo -n "Please input username: "
         read DOCKER_USERNAME
+        echo " - $DOCKER_USERNAME"
     fi
 
     if [ -z "$DOCKER_PASSWORD" ]; then
         # no password is provided
         echo -n "Please input password: "
         read DOCKER_PASSWORD
+        echo " - $DOCKER_PASSWORD"
     fi
 
     TRAVIS_SCRIPT=$(git pull && cat .travis.yml | grep -P 'docker \w+' | awk '{print substr($0,5) " && \\"}END{print "echo Success"}')
