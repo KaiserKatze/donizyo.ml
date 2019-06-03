@@ -71,7 +71,7 @@ push_all() {
 }
 
 easy() {
-    TRAVIS_SCRIPT=$(git pull && cat .travis.yml | grep -P 'docker \w+' | awk '{print substr($0,5) " && \\"}END{print "echo Success"}')
+    TRAVIS_SCRIPT=$(cat .travis.yml | grep -P 'docker \w+' | awk '{print substr($0,5) " && \\"}END{print "echo Success"}')
     if [ "$2" == "--dry-run" ]; then
         echo $TRAVIS_SCRIPT
     else
