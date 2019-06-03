@@ -8,7 +8,8 @@ ARG         VERSION_BIND=v9_14_2
 ARG         URL_BIND_KEYS=https://ftp.isc.org/isc/bind9/keys/9.11/bind.keys.v9_11
 
 # bind
-RUN         git clone --verbose \
+RUN         echo "Downloading BING9 source code from: $GIT_BIND9" && \
+            git clone --verbose \
                 --depth 1 \
                 --single-branch \
                 --branch "$VERSION_BIND" \

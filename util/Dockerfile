@@ -13,7 +13,8 @@ ARG         URI_ENVVAR=/etc/environment
 
 # pcre
 WORKDIR     $PATH_APP
-RUN         curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
+RUN         echo "Downloading pcre source code from: $URL_PCRE_TARBALL" && \
+            curl -sL "$URL_PCRE_TARBALL" -o pcre.tar.gz && \
             tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
 WORKDIR     $PATH_APP/pcre
 RUN         ./configure --prefix="$PCRE_PREFIX"
@@ -23,7 +24,8 @@ RUN         rm -f $PATH_APP/pcre.tar.gz
 
 # zlib
 WORKDIR     $PATH_APP
-RUN         curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
+RUN         echo "Downloading zlib source code from: $URL_ZLIB_TARBALL" && \
+            curl -sL "$URL_ZLIB_TARBALL" -o zlib.tar.gz && \
             tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
 WORKDIR     $PATH_APP/zlib
 RUN         ./configure --prefix="$ZLIB_PREFIX"
@@ -33,7 +35,8 @@ RUN         rm -f $PATH_APP/zlib.tar.gz
 
 # openssl
 WORKDIR     $PATH_APP
-RUN         git clone --verbose \
+RUN         echo "Downloading OpenSSL source code from: $GIT_OPENSSL" && \
+            git clone --verbose \
                 --depth 1 \
                 --single-branch \
                 --branch "$VERSION_OPENSSL" \
