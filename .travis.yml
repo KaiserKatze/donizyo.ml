@@ -16,10 +16,10 @@ script:
   - docker build -t bind ./bind
   - docker images
 after_success:
-  - docker tag openssl $DOCKER_USERNAME/openssl:1.1.0k && docker push $DOCKER_USERNAME/openssl:1.1.0k
-  - docker tag nginx $DOCKER_USERNAME/nginx:1.16.0 && docker push $DOCKER_USERNAME/nginx:1.16.0
-  - docker tag sqlite $DOCKER_USERNAME/sqlite:3.28.0 && docker push $DOCKER_USERNAME/sqlite:3.28.0
-  - docker tag python $DOCKER_USERNAME/python:3.7.3 && docker push $DOCKER_USERNAME/python:3.7.3
-  - docker tag bind $DOCKER_USERNAME/bind:9.14.2 && docker push $DOCKER_USERNAME/bind:9.14.2
+  - docker tag openssl $DOCKER_USERNAME/openssl && docker push $DOCKER_USERNAME/openssl
+  - docker tag nginx $DOCKER_USERNAME/nginx && docker push $DOCKER_USERNAME/nginx
+  - docker tag sqlite $DOCKER_USERNAME/sqlite && docker push $DOCKER_USERNAME/sqlite
+  - docker tag python $DOCKER_USERNAME/python && docker push $DOCKER_USERNAME/python
+  - docker tag bind $DOCKER_USERNAME/bind && docker push $DOCKER_USERNAME/bind
 after_script:
   - docker logout

@@ -11,51 +11,33 @@ trap onerror ERR
 # Image dependencies
 # supported by bash 4
 declare -A image_dep=( ["bind"]="python" ["python"]="sqlite" ["sqlite"]="openssl" ["openssl"]="" )
-declare -A image_ver=( ["bind"]="9.14.2" ["python"]="3.7.3" ["sqlite"]="3.28.0" ["openssl"]="1.1.0k" )
 
 pull() {
     image=$1
-    version=$2
     if [ -z "$image" ]; then exit 1; fi
-    if [ -z "$version" ]; then version="latest"; fi
     repo=$DOCKER_USERNAME/$image
-    docker pull $repo:$version
-    docker tag  $repo:$version  $image
-    docker tag  $repo:$version  $image:$version
-    docker rmi  $repo:$version
-}
-
-check_dep() {
-    image=$1
-    dep=${image_dep["$image"]}
-    if [ -n "$dep" ]; then
-        dep_ver=${image_ver["$dep"]}
-        docker images $dep:$dep_ver || exit 1
-    fi
+    docker pull $repo
+    docker tag  $repo  $image
+    docker rmi  $repo
 }
 
 build() {
     image=$1
-    version=$2
     repo=$DOCKER_USERNAME/$image
-    check_dep $image
     docker build -t $image ./$image
-    docker tag  $image  $repo:$version
-    docker push         $repo:$version
-    docker tag  $image  $repo
-    docker push         $repo
+    push $image
 }
 
 build_base() {
     docker build -t base ./base
+    docker build -t util ./util
 }
 
 build_all() {
     build_base
-    build openssl   1.1.0k
-    build sqlite    3.28.0
-    build python    3.7.3
-    build bind      9.14.2
+    build sqlite
+    build python
+    build bind
 }
 
 build_only() {
@@ -70,16 +52,13 @@ build_only() {
     done
     build_base
     for image in $list; do
-        build $image ${image_ver["$image"]}
+        build $image
     done
 }
 
 push() {
     image=$1
-    version=$2
     repo=$DOCKER_USERNAME/$image
-    docker tag  $image  $repo:$version
-    docker push         $repo:$version
     docker tag  $image  $repo
     docker push         $repo
 }
@@ -87,12 +66,17 @@ push() {
 push_all() {
     list=$(docker images | awk 'NR>1' | cut -d' ' -f1)
     for image in $list; do
-        push $image ${image_ver["$image"]}
+        push $image
     done
 }
 
 easy() {
     cat .travis.yml | grep -P '^\s+- docker \w+' | awk 'BEGIN{print "git pull && \\"}{print "\t" substr($0,5) " && \\"}END{print "\tdocker rmi $(docker images -f dangling=true -q)"}' | bash
+}
+
+clean() {
+    docker rm $(docker ps -qa)
+    docker rmi $(docker images --format "{{.Repository}}:{{.ID}}" | sed '/^ubuntu/d' | cut -d: -f2)
 }
 
 case "$1" in
@@ -101,19 +85,23 @@ case "$1" in
     ;;
 
     only)
-    build_only "$2"
+    build_only "$2" && push_all
     ;;
 
     pull)
-    pull "$2" "$3"
+    pull "$2"
     ;;
 
     push)
-    push "$2" "$3"
+    push "$2"
     ;;
 
     easy)
     easy
+    ;;
+
+    clean)
+    clean
     ;;
 
     *)

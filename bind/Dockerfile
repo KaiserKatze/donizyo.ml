@@ -1,11 +1,11 @@
 FROM        python AS bind
-LABEL       image=bind:9.14.2
 
 # DNS
 EXPOSE      53/udp
 
 ARG         GIT_BIND9=https://gitlab.isc.org/isc-projects/bind9.git
 ARG         VERSION_BIND=v9_14_2
+ARG         URL_BIND_KEYS=https://ftp.isc.org/isc/bind9/keys/9.11/bind.keys.v9_11
 
 # bind
 RUN         git clone --verbose \
@@ -38,25 +38,14 @@ RUN         test -d "$PATH_PYTHON_PACKAGES" && \
 RUN         make
 RUN         make install
 
-WORKDIR     $PATH_APP
-RUN         rm -rf bind9
-
 # configuration
 RUN         useradd -M -d /nonexistent -s /usr/sbin/nologin bind
 
 WORKDIR     /etc/bind
 # @see: https://www.isc.org/downloads/bind/bind-keys/
-RUN         curl -sL https://ftp.isc.org/isc/bind9/keys/9.11/bind.keys.v9_11 -o bind.keys
+RUN         curl -sL $URL_BIND_KEYS -o bind.keys
 
-WORKDIR     /tmp
-ARG         GIT_SELF=https://github.com/donizyo/donizyo.ml.git
-RUN         git clone --verbose \
-                --depth 1 \
-                --single-branch \
-                --branch master \
-                -- "$GIT_SELF" self
 WORKDIR     /tmp/self/bind
-
 RUN         cp -r .config/* /
 RUN         chmod 644 /etc/logrotate.d/bind && \
             chown root:root /etc/logrotate.d/bind
@@ -77,9 +66,6 @@ RUN         mkdir -p /var/log/bind && \
             chmod 644 *.log && \
             chown bind:bind *.log
 RUN         chmod 755 /etc/init.d/bind9
-
-WORKDIR     /tmp
-RUN         rm -rf /tmp/self
 
 # bind test
 RUN         named -V || echo "Fail to compile BIND9!"
