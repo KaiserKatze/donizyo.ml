@@ -8,6 +8,7 @@ ARG         VERSION_BIND=v9_14_2
 ARG         URL_BIND_KEYS=https://ftp.isc.org/isc/bind9/keys/9.11/bind.keys.v9_11
 
 # bind
+WORKDIR     $PATH_APP
 RUN         git clone --verbose \
                 --depth 1 \
                 --single-branch \
