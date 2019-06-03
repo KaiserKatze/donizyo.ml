@@ -71,25 +71,29 @@ push_all() {
 }
 
 easy() {
-    TRAVIS_SCRIPT=$(cat .travis.yml | grep -P 'docker \w+' | awk '{print substr($0,5) " && \\"}END{print "echo Success"}')
-    if [ "$1" == "--dry-run" ]; then
-        echo $TRAVIS_SCRIPT
-    else
-        if [ -z "$DOCKER_USERNAME" ]; then
-            # no username is provided
-            echo -n "Please input username: "
-            read DOCKER_USERNAME
-        fi
-
-        if [ -z "$DOCKER_PASSWORD" ]; then
-            # no password is provided
-            echo -n "Please input password: "
-            read DOCKER_PASSWORD
-        fi
-        echo $TRAVIS_SCRIPT | bash
-        images_without_tag=$(docker images -f dangling=true -q)
-        [ -n "$images_without_tag" ] && docker rmi $images_without_tag
+    if [ -z "$DOCKER_USERNAME" ]; then
+        # no username is provided
+        echo -n "Please input username: "
+        read DOCKER_USERNAME
     fi
+    if [ -z "$DOCKER_PASSWORD" ]; then
+        # no password is provided
+        echo -n "Please input password: "
+        read DOCKER_PASSWORD
+    fi
+
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    docker build -t base ./base
+    docker build -t util ./util
+    docker build -t nginx ./nginx && docker tag nginx $DOCKER_USERNAME/nginx && docker push $DOCKER_USERNAME/nginx
+    docker build -t sqlite ./python/sqlite && docker tag sqlite $DOCKER_USERNAME/sqlite && docker push $DOCKER_USERNAME/sqlite
+    docker build -t python ./python && docker tag python $DOCKER_USERNAME/python && docker push $DOCKER_USERNAME/python
+    docker build -t bind ./bind && docker tag bind $DOCKER_USERNAME/bind && docker push $DOCKER_USERNAME/bind
+    docker images
+    docker logout
+
+    images_without_tag=$(docker images -f dangling=true -q)
+    [ -n "$images_without_tag" ] && docker rmi $images_without_tag
 }
 
 clean() {
@@ -117,7 +121,7 @@ case "$1" in
     ;;
 
     easy)
-    easy "$2"
+    easy
     ;;
 
     clean)
@@ -129,7 +133,7 @@ case "$1" in
     echo "       $0 only <image>"
     echo "       $0 pull <image> [version]"
     echo "       $0 push <image> [version]"
-    echo "       $0 easy [--dry-run]"
+    echo "       $0 easy"
     echo "       $0 clean"
     exit 1
     ;;
