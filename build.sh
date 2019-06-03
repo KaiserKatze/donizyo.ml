@@ -71,7 +71,28 @@ push_all() {
 }
 
 easy() {
-    cat .travis.yml | grep -P '^\s+- docker \w+' | awk 'BEGIN{print "git pull && \\"}{print "\t" substr($0,5) " && \\"}END{print "\tdocker rmi $(docker images -f dangling=true -q)"}' | bash
+    if [ -z "$DOCKER_USERNAME" ]; then
+        # no username is provided
+        echo -n "Please input username: "
+        read DOCKER_USERNAME
+    fi
+
+    if [ -z "$DOCKER_PASSWORD" ]; then
+        # no password is provided
+        echo -n "Please input password: "
+        read DOCKER_PASSWORD
+    fi
+
+    TRAVIS_SCRIPT=$(git pull && cat .travis.yml | grep -P 'docker \w+' | awk '{print substr($0,5) " && \\"}END{print "echo Success"}')
+
+    if [ -n "$2" ]; then
+        echo $TRAVIS_SCRIPT
+    else
+        echo $TRAVIS_SCRIPT | bash
+    fi
+
+    images_without_tag=$(docker images -f dangling=true -q)
+    [ -n "$images_without_tag" ] && docker rmi $images_without_tag
 }
 
 clean() {
@@ -99,7 +120,7 @@ case "$1" in
     ;;
 
     easy)
-    easy
+    easy "$2"
     ;;
 
     clean)
@@ -109,8 +130,10 @@ case "$1" in
     *)
     echo "Usage: $0 all"
     echo "       $0 only <image>"
-    echo "       $0 push <image> [version]"
     echo "       $0 pull <image> [version]"
+    echo "       $0 push <image> [version]"
+    echo "       $0 easy [--dry-run]"
+    echo "       $0 clean"
     exit 1
     ;;
 esac
