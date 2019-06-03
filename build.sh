@@ -71,30 +71,25 @@ push_all() {
 }
 
 easy() {
-    if [ -z "$DOCKER_USERNAME" ]; then
-        # no username is provided
-        echo -n "Please input username: "
-        read DOCKER_USERNAME
-        echo " - $DOCKER_USERNAME"
-    fi
-
-    if [ -z "$DOCKER_PASSWORD" ]; then
-        # no password is provided
-        echo -n "Please input password: "
-        read DOCKER_PASSWORD
-        echo " - $DOCKER_PASSWORD"
-    fi
-
     TRAVIS_SCRIPT=$(git pull && cat .travis.yml | grep -P 'docker \w+' | awk '{print substr($0,5) " && \\"}END{print "echo Success"}')
-
     if [ -n "$2" ]; then
         echo $TRAVIS_SCRIPT
     else
-        echo $TRAVIS_SCRIPT | bash
-    fi
+        if [ -z "$DOCKER_USERNAME" ]; then
+            # no username is provided
+            echo -n "Please input username: "
+            read DOCKER_USERNAME
+        fi
 
-    images_without_tag=$(docker images -f dangling=true -q)
-    [ -n "$images_without_tag" ] && docker rmi $images_without_tag
+        if [ -z "$DOCKER_PASSWORD" ]; then
+            # no password is provided
+            echo -n "Please input password: "
+            read DOCKER_PASSWORD
+        fi
+        echo $TRAVIS_SCRIPT | bash
+        images_without_tag=$(docker images -f dangling=true -q)
+        [ -n "$images_without_tag" ] && docker rmi $images_without_tag
+    fi
 }
 
 clean() {
