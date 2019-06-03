@@ -75,8 +75,10 @@ easy() {
 }
 
 clean() {
-    docker rm $(docker ps -qa)
-    docker rmi $(docker images --format "{{.Repository}}:{{.ID}}" | sed '/^ubuntu/d' | cut -d: -f2)
+    CONTAINERS=$(docker ps -qa)
+    [ -n "$CONTAINERS" ] && docker rm $CONTAINERS
+    IMAGES=$(docker images --format "{{.Repository}}:{{.ID}}" | sed '/^ubuntu/d' | cut -d: -f2)
+    [ -n "$IMAGES" ] && docker rmi $IMAGES
 }
 
 case "$1" in
