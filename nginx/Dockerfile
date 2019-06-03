@@ -7,14 +7,12 @@ EXPOSE      443/tcp
 # RTMP
 EXPOSE      1935/tcp
 
-ARG         VERSION_NGINX=1.16.0
-ARG         URL_NGINX_TARBALL=https://nginx.org/download/nginx-$VERSION_NGINX.tar.gz
+ARG         URL_NGINX_TARBALL=https://nginx.org/download/nginx-1.16.0.tar.gz
 ARG         GIT_NGINX_RTMP_MODULE=https://github.com/arut/nginx-rtmp-module
 ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
 
 # nginx
-RUN         echo "Downloading Nginx source code from: $URL_NGINX_TARBALL" && \
-            curl -sL "$URL_NGINX_TARBALL" -o nginx.tar.gz && \
+RUN         curl -sL $URL_NGINX_TARBALL -o nginx.tar.gz && \
             tar -xf nginx.tar.gz --one-top-level=nginx --strip-components 1
 WORKDIR     $PATH_APP/nginx
 
@@ -22,8 +20,8 @@ WORKDIR     $PATH_APP/nginx
 RUN         git clone --verbose \
                 --depth 1 \
                 --single-branch \
-                --branch "$VERSION_NGINX_RTMP_MODULE" \
-                -- "$GIT_NGINX_RTMP_MODULE" nginx-rtmp-module
+                --branch $VERSION_NGINX_RTMP_MODULE \
+                -- $GIT_NGINX_RTMP_MODULE nginx-rtmp-module
 
 # @see: http://nginx.org/en/docs/configure.html
 # compile --without-http_gzip_module, thus need not --with-zlib,

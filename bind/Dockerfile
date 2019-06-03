@@ -8,17 +8,16 @@ ARG         VERSION_BIND=v9_14_2
 ARG         URL_BIND_KEYS=https://ftp.isc.org/isc/bind9/keys/9.11/bind.keys.v9_11
 
 # bind
-RUN         echo "Downloading BING9 source code from: $GIT_BIND9" && \
-            git clone --verbose \
+RUN         git clone --verbose \
                 --depth 1 \
                 --single-branch \
-                --branch "$VERSION_BIND" \
-                -- "$GIT_BIND9" bind9
+                --branch $VERSION_BIND \
+                -- $GIT_BIND9 bind9
 RUN         python -m pip install ply
 RUN         apt-get -y install libjson-c-dev libkrb5-dev libcap-dev
 
 WORKDIR     $PATH_APP/bind9
-RUN         test -d "$PATH_PYTHON_PACKAGES" && \
+RUN         test -d $PATH_PYTHON_PACKAGES && \
             ./configure \
                 --prefix=/usr \
                 --mandir=/usr/share/man \
@@ -30,8 +29,8 @@ RUN         test -d "$PATH_PYTHON_PACKAGES" && \
                 --with-libtool \
                 --with-libjson \
                 --with-python=python \
-                --with-python-install-dir="$PATH_PYTHON_PACKAGES" \
-                --with-openssl="$OPENSSL_PREFIX" \
+                --with-python-install-dir=$PATH_PYTHON_PACKAGES \
+                --with-openssl=$OPENSSL_PREFIX \
                 --with-gssapi \
                 --with-gnu-ld \
                 --enable-full-report

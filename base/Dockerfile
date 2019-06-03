@@ -31,4 +31,4 @@ RUN         git clone --verbose \
                 --depth 1 \
                 --single-branch \
                 --branch master \
-                -- "$GIT_SELF" self
+                -- $GIT_SELF self

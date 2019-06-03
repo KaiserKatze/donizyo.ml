@@ -5,11 +5,10 @@ ARG         SQLITE_PREFIX=/usr/local
 
 # sqlite
 WORKDIR     $PATH_APP
-RUN         echo "Downloading SQLite3 source code from: $URL_SQLITE_TARBALL" && \
-            curl -sL "$URL_SQLITE_TARBALL" -o sqlite.tar.gz && \
+RUN         curl -sL $URL_SQLITE_TARBALL -o sqlite.tar.gz && \
             tar -xf sqlite.tar.gz --one-top-level=sqlite --strip-components 1
 WORKDIR     $PATH_APP/sqlite
-RUN         ./configure --prefix="$SQLITE_PREFIX"
+RUN         ./configure --prefix=$SQLITE_PREFIX
 RUN         make
 RUN         make install
 RUN         rm -f $PATH_APP/sqlite.tar.gz

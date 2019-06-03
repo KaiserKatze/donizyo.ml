@@ -9,8 +9,7 @@ RUN         apt-get -y install libffi-dev
 
 # python
 WORKDIR     $PATH_APP
-RUN         echo "Downloading Python3 source code from: $URL_PYTHON_TARBALL" && \
-            curl -sL "$URL_PYTHON_TARBALL" -o python.tar.xz && \
+RUN         curl -sL $URL_PYTHON_TARBALL -o python.tar.xz && \
             tar -xf python.tar.xz --one-top-level=python --strip-components 1
 
 WORKDIR     $PATH_APP/python
@@ -19,7 +18,7 @@ RUN         ./configure \
                 --enable-profiling \
                 --enable-shared \
                 --with-lto \
-                --with-openssl="$OPENSSL_PREFIX" \
+                --with-openssl=$OPENSSL_PREFIX \
                 --enable-optimizations
 RUN         make
 RUN         make install
