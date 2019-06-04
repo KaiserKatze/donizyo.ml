@@ -1,0 +1,43 @@
+version: '3'
+services:
+  base:
+    build:
+      context: ./base
+    image: base
+  util:
+    build:
+      context: ./util
+    image: util
+    depends_on:
+      - base
+  web:
+    build:
+      context: ./nginx
+      shm_size: '1gb'
+    image: nginx
+    depends_on:
+      - util
+    ports:
+      - "127.0.0.1:80:80/tcp"
+      - "127.0.0.1:443:443/tcp"
+      - "127.0.0.1:1935:1935/tcp"
+  sqlite:
+    build:
+      context: ./python/sqlite
+    image: sqlite
+    depends_on:
+      - util
+  python:
+    build:
+      context: ./python
+    image: python
+    depends_on:
+      - sqlite
+  dns:
+    build:
+      context: ./bind
+    image: bind
+    depends_on:
+      - python
+    ports:
+      - "127.0.0.1:53:53/udp"
