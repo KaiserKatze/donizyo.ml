@@ -113,7 +113,7 @@ clean() {
     CONTAINERS=$(docker ps -qa)
     [ -n "$CONTAINERS" ] && docker rm $CONTAINERS
     IMAGES=$(docker images --format "{{.Repository}}:{{.ID}}" | sed '/^ubuntu/d' | cut -d: -f2)
-    [ -n "$IMAGES" ] && docker rmi $IMAGES
+    [ -n "$IMAGES" ] && docker rmi -f $IMAGES
 }
 
 case "$1" in
