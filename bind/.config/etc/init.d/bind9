@@ -29,7 +29,6 @@ PIDFILE=/run/named/named.pid
 
 check_network() {
     if [ -z "$(/sbin/ip a)" ]; then
-       #log_action_msg "No networks configured."
        return 1
     fi
     return 0
