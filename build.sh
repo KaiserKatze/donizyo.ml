@@ -80,18 +80,17 @@ easy() {
 
     docker images
 
-    echo -n "Do you want to push newly built images? (Y/n) "
-    read do_push_images
+    read -p "Do you want to push newly built images? (Y/n) " do_push_images
     if [ "$do_push_images" == "Y" ] || [ "$do_push_images" == "y" ]; then
         if [ -z "$DOCKER_USERNAME" ]; then
             # no username is provided
-            echo -n "Please input username: "
-            read DOCKER_USERNAME
+            read -s -p "Please input username: " DOCKER_USERNAME
+            echo
         fi
         if [ -z "$DOCKER_PASSWORD" ]; then
             # no password is provided
-            echo -n "Please input password: "
-            read DOCKER_PASSWORD
+            read -s -p "Please input password: " DOCKER_PASSWORD
+            echo
         fi
 
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
