@@ -15,7 +15,10 @@ RUN         git clone --verbose \
                 --branch $VERSION_BIND \
                 -- $GIT_BIND9 bind9
 RUN         python -m pip install ply
-RUN         apt-get -y install libjson-c-dev libkrb5-dev libcap-dev
+RUN         apt-get -y install libjson-c-dev
+RUN         apt-get -y install libkrb5-dev
+RUN         apt-get -y install libcap-dev
+RUN         apt-get -y install libgeoip-dev
 
 WORKDIR     $PATH_APP/bind9
 RUN         test -d $PATH_PYTHON_PACKAGES && \
@@ -26,12 +29,17 @@ RUN         test -d $PATH_PYTHON_PACKAGES && \
                 --infodir=/usr/share/info \
                 --sysconfdir=/etc/bind \
                 --localstatedir=/ \
+                --enable-threads \
                 --enable-largefile \
+                --enable-shared \
+                --enable-static \
                 --with-libtool \
                 --with-libjson \
+                --with-geoip \
                 --with-python=python \
                 --with-python-install-dir=$PATH_PYTHON_PACKAGES \
                 --with-openssl=$OPENSSL_PREFIX \
+                --with-zlib=$ZLIB_PREFIX \
                 --with-gssapi \
                 --with-gnu-ld \
                 --enable-full-report
