@@ -52,7 +52,7 @@ RUN         useradd -M -d /nonexistent -s /usr/sbin/nologin bind
 
 WORKDIR     /etc/bind
 # @see: https://www.isc.org/downloads/bind/bind-keys/
-RUN         curl -sL $URL_BIND_KEYS -o bind.keys
+RUN         curl -sL -C - --retry 5 --retry-delay 60 $URL_BIND_KEYS -o bind.keys
 
 WORKDIR     /tmp/self/bind
 RUN         cp -r .config/* /

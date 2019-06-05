@@ -5,7 +5,7 @@ ARG         SQLITE_PREFIX=/usr/local
 
 # sqlite
 WORKDIR     $PATH_APP
-RUN         curl -sL $URL_SQLITE_TARBALL -o sqlite.tar.gz && \
+RUN         curl -sL -C - --retry 5 --retry-delay 60 $URL_SQLITE_TARBALL -o sqlite.tar.gz && \
             tar -xf sqlite.tar.gz --one-top-level=sqlite --strip-components 1
 WORKDIR     $PATH_APP/sqlite
 RUN         ./configure --prefix=$SQLITE_PREFIX

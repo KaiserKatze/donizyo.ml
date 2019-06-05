@@ -13,7 +13,7 @@ ARG         URI_ENVVAR=/etc/environment
 
 # pcre
 WORKDIR     $PATH_APP
-RUN         curl -sL $URL_PCRE_TARBALL -o pcre.tar.gz && \
+RUN         curl -sL -C - --retry 5 --retry-delay 60 $URL_PCRE_TARBALL -o pcre.tar.gz && \
             tar -xf pcre.tar.gz --one-top-level=pcre --strip-components 1
 WORKDIR     $PATH_APP/pcre
 RUN         ./configure --prefix=$PCRE_PREFIX
@@ -23,7 +23,7 @@ RUN         rm -f $PATH_APP/pcre.tar.gz
 
 # zlib
 WORKDIR     $PATH_APP
-RUN         curl -sL $URL_ZLIB_TARBALL -o zlib.tar.gz && \
+RUN         curl -sL -C - --retry 5 --retry-delay 60 $URL_ZLIB_TARBALL -o zlib.tar.gz && \
             tar -xf zlib.tar.gz --one-top-level=zlib --strip-components 1
 WORKDIR     $PATH_APP/zlib
 RUN         ./configure --prefix=$ZLIB_PREFIX

@@ -9,7 +9,7 @@ RUN         apt-get -y install libffi-dev
 
 # python
 WORKDIR     $PATH_APP
-RUN         curl -sL $URL_PYTHON_TARBALL -o python.tar.xz && \
+RUN         curl -sL -C - --retry 5 --retry-delay 60 $URL_PYTHON_TARBALL -o python.tar.xz && \
             tar -xf python.tar.xz --one-top-level=python --strip-components 1
 
 WORKDIR     $PATH_APP/python
