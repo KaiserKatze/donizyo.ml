@@ -1,3 +1,6 @@
-Test TravisCI Docker
+Build common web services as Docker images.
 
-Build Nginx
+# Available Images
+- Nginx
+- BIND
+- Python
