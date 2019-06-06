@@ -74,7 +74,8 @@ RUN         mkdir -p /var/log/bind && \
             touch default.log && \
             chmod 644 *.log && \
             chown bind:bind *.log
-RUN         chmod 755 /etc/init.d/bind9
+RUN         chmod 755 /etc/init.d/bind9 && \
+            cat /etc/init.d/bind9
 
 # bind test
 RUN         named -V || echo "Fail to compile BIND9!"
