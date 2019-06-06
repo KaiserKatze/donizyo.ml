@@ -24,6 +24,11 @@ RUN         make
 RUN         make install
 RUN         rm -f $PATH_APP/python.tar.xz
 
+# @see: http://www.yecuizhen.com/archives/20/
+# @see: http://www.yanyaozhen.com/archives/392/
+# @see: https://www.jianshu.com/p/969a84227829
+# Solve exception as follows when executing `python3 -V`:
+# `python3: error while loading shared libraries: libpython3.7m.so.1.0: cannot open shared object file: No such file or directory`
 RUN         echo "/usr/local/lib/" > "/etc/ld.so.conf.d/python3.conf" && ldconfig && \
             update-alternatives --install /usr/local/bin/python python /usr/local/bin/python3 10
 # manually check update-alternatives
