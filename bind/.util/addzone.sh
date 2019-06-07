@@ -50,6 +50,7 @@ get_host_ip() {
     return 1
 }
 
+admin_name=admin
 domain_name=
 read -p "Please input domain name: " domain_name
 if [ -n "$domain_name" ];
@@ -82,12 +83,13 @@ retry_interval=30m
 expiry_period=3w
 negative_ttl=1h
 
-cat > /etc/bind/zones/$file_name << EOF
+file_path=/etc/bind/zones/$file_name
+cat > $file_path << EOF
 \$ORIGIN $domain_name.
 \$TTL $zone_ttl
 
 ; Symbol '@' is a placeholder for '\$ORIGIN'
-@ IN SOA ns1.$domain_name. donizyo.$domain_name. (
+@ IN SOA ns1.$domain_name. $admin_name.$domain_name. (
   ; Serial number,
   ; change this value each time you modify this file
   $serial_number
@@ -142,4 +144,11 @@ www     IN      CNAME   $domain_name.
 @       IN      MX      5       aspmx3.googlemail.com.
 @       IN      MX      5       aspmx4.googlemail.com.
 @       IN      MX      5       aspmx5.googlemail.com.
+EOF
+
+cat >> /etc/bind/named.conf.local << EOF
+zone "$domain_name" {
+    type master;
+    file "$file_path";
+};
 EOF
