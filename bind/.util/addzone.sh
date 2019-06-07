@@ -1,5 +1,18 @@
 #!/bin/bash
 
+export PATH_CERTBOT_INI=/opt/certbot/rfc2136.ini
+
+admin_name=admin
+domain_name=
+read -p "Please input domain name: " domain_name
+if [ -n "$domain_name" ];
+then
+    echo "$domain_name" > /opt/domain
+else
+    echo "No '\$domain_name' is specified!"
+    exit 1
+fi
+
 get_host_ip() {
     adapters=$(ip -4 a | awk '/inet/{print $2}' | cut -d'/' -f1)
     for adapter in $adapters;
@@ -49,17 +62,6 @@ get_host_ip() {
     done
     return 1
 }
-
-admin_name=admin
-domain_name=
-read -p "Please input domain name: " domain_name
-if [ -n "$domain_name" ];
-then
-    echo "$domain_name" > /opt/domain
-else
-    echo "No '\$domain_name' is specified!"
-    exit 1
-fi
 
 host_ip=
 read -p "Do you want to use the external IP of the current machine in your zone file? (Y/n) " use_host_ip
@@ -168,4 +170,19 @@ zone "$domain_name" {
         grant $keyname name $url_challenge txt;
     };
 };
+EOF
+
+cat > $PATH_CERTBOT_INI << EOF
+# Target DNS server
+dns_rfc2136_server = 127.0.0.1
+# Target DNS port
+dns_rfc2136_port = 53
+# Authorative domain (optional, will try to auto-detect if missing)
+dns_rfc2136_base_domain = $domain_name
+# TSIG key name
+dns_rfc2136_name = $keyname
+# TSIG key secret
+dns_rfc2136_secret = $secret
+# TSIG key algorithm
+dns_rfc2136_algorithm = $algorithm
 EOF
