@@ -149,10 +149,35 @@ www     IN      CNAME   $domain_name.
 EOF
 
 # @see: https://unix.stackexchange.com/q/523565/244069
+# @see: https://certbot-dns-rfc2136.readthedocs.io/en/stable/
+# @see: https://ftp.isc.org/isc/bind9/9.14.2/doc/arm/Bv9ARM.ch05.html#zone_statement_grammar
 algorithm=hmac-sha512
 keyname=tsig-key
 tsig_key_path=/etc/bind/tsig.key
+# You should protect this TSIG key material
+# as it can be used to potentially add, update,
+# or delete any record in the target DNS server.
+# Users who can read this file can use these credentials
+# to issue arbitrary API calls on your behalf.
+# Users who can cause Certbot to run using these credentials
+# can complete a `dns-01` challenge to acquire
+# new certificates or revoke existing certificates
+# for associated domains, even if
+# those domains aren’t being managed by this server.
 tsig-keygen -a $algorithm $keyname > $tsig_key_path
+# Certbot will emit a warning if it detects
+# that the credentials file can be accessed
+# by other users on your system.
+# The warning reads “Unsafe permissions
+# on credentials configuration file”,
+# followed by the path to the credentials file.
+# This warning will be emitted each time
+# Certbot uses the credentials file,
+# including for renewal, and cannot be silenced
+# except by addressing the issue
+# (e.g., by using a command like chmod 600 to restrict access to the file).
+chown root:root $tsig_key_path
+chmod 600 $tsig_key_path
 secret=$(cat $tsig_key_path | awk '/secret/' | cut -d'"' -f2)
 url_challenge=https://acme-v02.api.letsencrypt.org/directory
 
