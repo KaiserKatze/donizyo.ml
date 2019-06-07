@@ -146,9 +146,26 @@ www     IN      CNAME   $domain_name.
 @       IN      MX      5       aspmx5.googlemail.com.
 EOF
 
+# @see: https://unix.stackexchange.com/q/523565/244069
+algorithm=hmac-sha512
+keyname=tsig-key
+tsig_key_path=/etc/bind/tsig.key
+tsig-keygen -a $algorithm $keyname > $tsig_key_path
+secret=$(cat $tsig_key_path | awk '/secret/' | cut -d'"' -f2)
+url_challenge=https://acme-v02.api.letsencrypt.org/directory
+
 cat >> /etc/bind/named.conf.local << EOF
+include "$tsig_key_path";
+
 zone "$domain_name" {
     type master;
     file "$file_path";
+
+    // limits the scope of the TSIG key to just be able to
+    // add and remove TXT records for one specific host
+    // for the purpose of completing the dns-01 challenge
+    update-policy {
+        grant $keyname name $url_challenge txt;
+    };
 };
 EOF
