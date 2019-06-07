@@ -14,10 +14,19 @@ RUN         git clone --verbose \
                 --single-branch \
                 --branch $VERSION_BIND \
                 -- $GIT_BIND9 bind9
+
+# dependencies
+
 RUN         python -m pip install ply
+# json-style statistics
 RUN         apt-get -y install libjson-c-dev
+#
 RUN         apt-get -y install libkrb5-dev
+# set process privileges
+# you won't need this lib,
+# if option `--disable-linux-caps` exists
 RUN         apt-get -y install libcap-dev
+# geoip
 RUN         apt-get -y install libgeoip-dev
 
 WORKDIR     $PATH_APP/bind9
