@@ -52,6 +52,12 @@ get_host_ip() {
 
 domain_name=
 read -p "Please input domain name: " domain_name
+if [ -n "$domain_name" ];
+then
+    echo "$domain_name" > /opt/domain
+else
+    exit 1
+fi
 
 host_ip=
 read -p "Do you want to use the external IP of the current machine in your zone file? (Y/n) " use_host_ip
@@ -59,6 +65,9 @@ if [ "$use_host_ip" == "Y" ] || [ "$use_host_ip" == "y" ]; then
     host_ip=$(get_host_ip)
 else
     read -p "Please input IP: " host_ip
+    if [ -z "$host_ip" ]; then
+        host_ip=$(get_host_ip)
+    fi
 fi
 echo "Using IP [$host_ip] ..."
 
