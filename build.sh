@@ -110,7 +110,7 @@ easy() {
 
 clean() {
     CONTAINERS=$(docker ps -qa)
-    [ -n "$CONTAINERS" ] && docker rm $CONTAINERS
+    [ -n "$CONTAINERS" ] && docker rm -f $CONTAINERS
     IMAGES=$(docker images --format "{{.Repository}}:{{.ID}}" | sed '/^ubuntu/d' | cut -d: -f2)
     [ -n "$IMAGES" ] && docker rmi -f $IMAGES
 }
