@@ -24,11 +24,3 @@ ARG         APT_SOURCELIST=/etc/apt/sources.list
 RUN         echo "deb http://ftp.de.debian.org/debian buster main" >> $APT_SOURCELIST
 RUN         apt-get -y install python2.7
 RUN         update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
-
-WORKDIR     /tmp
-ARG         GIT_SELF=https://github.com/donizyo/donizyo.ml.git
-RUN         git clone --verbose \
-                --depth 1 \
-                --single-branch \
-                --branch master \
-                -- $GIT_SELF self

@@ -56,6 +56,7 @@ if [ -n "$domain_name" ];
 then
     echo "$domain_name" > /opt/domain
 else
+    echo "No '\$domain_name' is specified!"
     exit 1
 fi
 

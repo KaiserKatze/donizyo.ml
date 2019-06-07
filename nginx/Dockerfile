@@ -59,8 +59,9 @@ RUN         make install
 WORKDIR     /tmp/self/nginx
 RUN         mkdir -p /etc/nginx && \
             chmod 2755 /etc/nginx && \
-            chown root:root /etc/nginx && \
-            cp -r .config/* /
+            chown root:root /etc/nginx
+ADD         .config /tmp/nginx/config
+RUN         cp -r /tmp/nginx/config/* /
 
 # nginx test
 RUN         nginx -V || echo "Fail to compile Nginx!"

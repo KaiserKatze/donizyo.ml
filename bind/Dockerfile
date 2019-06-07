@@ -54,8 +54,9 @@ WORKDIR     /etc/bind
 # @see: https://www.isc.org/downloads/bind/bind-keys/
 RUN         curl -sL -C - --retry 5 --retry-delay 60 $URL_BIND_KEYS -o bind.keys
 
-WORKDIR     /tmp/self/bind
-RUN         cp -r .config/* /
+ADD         .config /tmp/bind/config
+RUN         cp -r /tmp/bind/config/* /
+RUN         rm -rf /tmp/bind/config
 RUN         chmod 644 /etc/logrotate.d/bind && \
             chown root:root /etc/logrotate.d/bind
 RUN         chmod 2755 /etc/bind && \
