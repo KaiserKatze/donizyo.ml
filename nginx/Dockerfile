@@ -13,7 +13,7 @@ ARG         VERSION_NGINX_RTMP_MODULE=v1.2.1
 
 # nginx
 WORKDIR     $PATH_APP
-RUN         curl -sL -C - --retry 5 --retry-delay 60 $URL_NGINX_TARBALL -o nginx.tar.gz && \
+RUN         curl -sL --retry 5 --retry-delay 60 $URL_NGINX_TARBALL -o nginx.tar.gz && \
             tar -xf nginx.tar.gz --one-top-level=nginx --strip-components 1
 WORKDIR     $PATH_APP/nginx
 
