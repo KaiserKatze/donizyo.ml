@@ -14,6 +14,8 @@ RUN         echo "Installing necessary packages:" && \
             apt-get update && \
             apt-get -y install curl tar git && \
             apt-get -y install build-essential
+# Install `gpg`
+RUN         apt-get -y install gnupg
 # Install `ip`
 RUN         apt-get -y install iproute2
 # Install editor
