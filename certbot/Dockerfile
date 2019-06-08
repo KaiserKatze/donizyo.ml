@@ -1,7 +1,7 @@
 FROM        base AS certbot
 
 # check dependencies
-ARG         which named && named -v || exit 1
+RUN         which named && named -v || exit 1
 
 # prevent installation of `tzdata` package enter interactive mode
 # @see: https://stackoverflow.com/questions/44331836/apt-get-install-tzdata-noninteractive
