@@ -9,12 +9,12 @@ RUN         ln -sf /usr/share/zoneinfo/PRC /etc/localtime && \
             dpkg-reconfigure -f noninteractive tzdata
 # Install Let's Encrypt - Certbot
 # @see: https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
-RUN         apt-get update && \
-            apt-get -y install software-properties-common && \
-            add-apt-repository -y universe && \
-            add-apt-repository -y ppa:certbot/certbot && \
-            apt-get update && \
-            apt-get -y install python3-certbot-dns-rfc2136
+RUN         apt-get update
+RUN         apt-get -y install software-properties-common
+RUN         add-apt-repository -y universe
+RUN         add-apt-repository -y ppa:certbot/certbot
+RUN         apt-get update
+RUN         apt-get -y install python3-certbot-dns-rfc2136
 
 ARG         WILDCARD_CERT_SERVER=https://acme-v02.api.letsencrypt.org/directory
 RUN         export domain_name=$(cat /opt/domain) && \
