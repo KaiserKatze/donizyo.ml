@@ -22,7 +22,7 @@ docker run -d \
     -p 127.0.0.1:53:53/udp \
     --name dns \
     bind \
-    /etc/init.d/bind9 start
+    named -g -u bind
 
 # obtain https certificate
 # @see: https://certbot.eff.org/docs/install.html#running-with-docker
