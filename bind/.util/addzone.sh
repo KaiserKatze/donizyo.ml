@@ -75,15 +75,18 @@ get_host_ip() {
     return 1
 }
 
-host_ip=
-read -p "Do you want to use the external IP of the current machine in your zone file? (Y/n) " use_host_ip
-if [ "$use_host_ip" == "Y" ] || [ "$use_host_ip" == "y" ]; then
-    host_ip=$(get_host_ip)
-else
-    read -p "Please input IP: " host_ip
-    if [ -z "$host_ip" ]; then
+if [ "$DEBIAN_FRONTEND" != "noninteractive" ] && [ -z "$host_ip" ];
+then
+    read -p "Do you want to use the external IP of the current machine in your zone file? (Y/n) " use_host_ip
+    if [ "$use_host_ip" == "Y" ] || [ "$use_host_ip" == "y" ];
+    then
         host_ip=$(get_host_ip)
+    else
+        read -p "Please input IP: " host_ip
     fi
+fi
+if [ -z "$host_ip" ]; then
+    host_ip=$(get_host_ip)
 fi
 echo "Using IP [$host_ip] ..."
 # transform ip such as '1.2.3.4' into '4.3.2.1.'
