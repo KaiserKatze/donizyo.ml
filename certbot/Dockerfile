@@ -11,6 +11,7 @@ RUN         apt-get -y install tzdata
 RUN         ln -sf /usr/share/zoneinfo/PRC /etc/localtime && \
             dpkg-reconfigure -f noninteractive tzdata
 # Install Let's Encrypt - Certbot
+# @see: https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
 RUN         apt-get update && \
             apt-get -y install software-properties-common && \
             add-apt-repository -y universe && \
@@ -23,10 +24,13 @@ RUN         export domain_name=$(cat /opt/domain) && \
             test -n "$domain_name" || \
             echo "File '/opt/domain' not found! DNS service is necessary!" && \
             exit 1
+
 ARG         PATH_CERTBOT_INI=/opt/certbot/rfc2136.ini
 RUN         dig @127.0.0.1 $domain_name || \
             echo "Fail to resolve '$domain_name' on localhost dns!" && \
             exit 1
+
+# @see: https://certbot.eff.org/docs/using.html
 RUN         which nginx && nginx -s quit || \
             echo "Nginx not found. Continue ..."
 RUN         certbot certonly -n \
