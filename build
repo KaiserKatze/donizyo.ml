@@ -74,7 +74,7 @@ easy() {
     docker build -t base ./base
     docker build -t util ./util
     docker build -t nginx ./nginx
-    docker build -t sqlite ./python/sqlite
+    docker build -t sqlite ./sqlite
     docker build -t python ./python
     docker build -t bind ./bind
 
