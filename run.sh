@@ -21,7 +21,7 @@ start() {
         -p 127.0.0.1:53:53/udp \
         --name dns \
         bind \
-        named -g -u bind
+        named -g -4 -u bind
 
     # obtain https certificate
     # @see: https://certbot.eff.org/docs/install.html#running-with-docker

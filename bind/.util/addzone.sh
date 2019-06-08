@@ -2,9 +2,21 @@
 
 export PATH_CERTBOT_INI=/opt/certbot/rfc2136.ini
 
-admin_name=admin
-domain_name=
-read -p "Please input domain name: " domain_name
+if [ "$DEBIAN_FRONTEND" != "noninteractive" ] && [ -z "$admin_name" ];
+then
+    read -p "Please input admin name (default: admin): " admin_name
+else
+    echo "Using default admin name: 'admin'!"
+fi
+if [ -z "$admin_name" ];
+then
+    admin_name=admin
+fi
+
+if [ "$DEBIAN_FRONTEND" != "noninteractive" ] && [ -z "$domain_name" ];
+then
+    read -p "Please input domain name: " domain_name
+fi
 if [ -n "$domain_name" ];
 then
     echo "$domain_name" > /opt/domain
