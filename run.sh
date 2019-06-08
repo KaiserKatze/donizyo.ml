@@ -21,7 +21,6 @@ hostname=matrix
 docker run -d \
     -p 127.0.0.1:53:53/udp \
     --name dns \
-    --hostname $hostname \
     bind \
     /etc/init.d/bind9 start
 
@@ -39,7 +38,8 @@ docker run -d \
     -p 127.0.0.1:80:80/tcp \
     -p 127.0.0.1:443:443/tcp \
     -p 127.0.0.1:1935:1935/tcp \
+    -v "/etc/letsencrypt:/etc/letsencrypt" \
+    -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
     --name web \
-    --hostname $hostname \
     nginx \
     nginx
