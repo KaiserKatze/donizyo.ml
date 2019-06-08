@@ -42,4 +42,4 @@ docker run -d \
     -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
     --name web \
     nginx \
-    nginx
+    nginx -g 'daemon off;'
