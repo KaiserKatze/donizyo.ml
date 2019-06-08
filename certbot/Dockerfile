@@ -1,4 +1,4 @@
-FROM        python AS certbot
+FROM        base AS certbot
 
 # check dependencies
 ARG         which named && named -v || exit 1
