@@ -186,7 +186,7 @@ tsig-keygen -a $algorithm $keyname > $tsig_key_path
 # except by addressing the issue
 # (e.g., by using a command like chmod 600 to restrict access to the file).
 chown root:root $tsig_key_path
-chmod 600 $tsig_key_path
+chmod 400 $tsig_key_path
 secret=$(cat $tsig_key_path | awk '/secret/' | cut -d'"' -f2)
 url_challenge=https://acme-v02.api.letsencrypt.org/directory
 
