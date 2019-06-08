@@ -9,7 +9,6 @@ RUN         ln -sf /usr/share/zoneinfo/PRC /etc/localtime && \
             dpkg-reconfigure -f noninteractive tzdata
 # Install Let's Encrypt - Certbot
 # @see: https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
-RUN         apt-get update
 RUN         apt-get -y install software-properties-common
 RUN         add-apt-repository -y universe
 RUN         add-apt-repository -y ppa:certbot/certbot
