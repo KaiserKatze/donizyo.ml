@@ -74,6 +74,12 @@ else
     fi
 fi
 echo "Using IP [$host_ip] ..."
+# transform ip such as '1.2.3.4' into '4.3.2.1.'
+# @see: https://stackoverflow.com/a/5257398/4927212
+# @see: https://unix.stackexchange.com/a/412874/244069
+host_ip_rev=$(printf "%s\n" ${host_ip//./ } | tac | tr '\n' '.')
+# append 'in-addr.arpa.'
+host_ip_rev=$host_ip_rev"in-addr.arpa."
 
 file_name=db.$domain_name
 today=$(date +%Y%m%d)
@@ -137,6 +143,9 @@ ns2     IN      A       $host_ip
 
 ; Aliases
 www     IN      CNAME   $domain_name.
+
+; PTR records
+$host_ip_rev IN PTR     $domain_name.
 
 ; MX records
 @       IN      MX      1       aspmx.l.google.com.
