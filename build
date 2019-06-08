@@ -43,6 +43,21 @@ easy() {
 
     docker images
 
+    # stop timer
+    timer_msg=
+    if (( $SECONDS > 3600 )) ; then
+        let "hours=SECONDS/3600"
+        let "minutes=(SECONDS%3600)/60"
+        let "seconds=(SECONDS%3600)%60"
+        timer_msg="Completed in $hours hour(s), $minutes minute(s) and $seconds second(s)"
+    elif (( $SECONDS > 60 )) ; then
+        let "minutes=(SECONDS%3600)/60"
+        let "seconds=(SECONDS%3600)%60"
+        timer_msg="Completed in $minutes minute(s) and $seconds second(s)"
+    else
+        timer_msg="Completed in $SECONDS seconds"
+    fi
+
     read -p "Do you want to push newly built images? (Y/n) " do_push_images
     if [ "$do_push_images" == "Y" ] || [ "$do_push_images" == "y" ]; then
         if [ -z "$DOCKER_USERNAME" ]; then
@@ -70,19 +85,7 @@ easy() {
         docker logout
     fi
 
-    # stop timer
-    if (( $SECONDS > 3600 )) ; then
-        let "hours=SECONDS/3600"
-        let "minutes=(SECONDS%3600)/60"
-        let "seconds=(SECONDS%3600)%60"
-        echo "Completed in $hours hour(s), $minutes minute(s) and $seconds second(s)"
-    elif (( $SECONDS > 60 )) ; then
-        let "minutes=(SECONDS%3600)/60"
-        let "seconds=(SECONDS%3600)%60"
-        echo "Completed in $minutes minute(s) and $seconds second(s)"
-    else
-        echo "Completed in $SECONDS seconds"
-    fi
+    echo "$timer_msg"
 }
 
 clean() {
