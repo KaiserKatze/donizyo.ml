@@ -36,4 +36,6 @@ options {
     statistics-file "/var/cache/bind/named.stats";
     rrset-order { order cyclic; };
     allow-transfer { 127.0.0.1; };
+
+    version none;
 };
