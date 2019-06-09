@@ -7,6 +7,8 @@ RUN         apt-get -y install tzdata
 # configure `tzdata`, using Beijing timezone
 RUN         ln -sf /usr/share/zoneinfo/PRC /etc/localtime && \
             dpkg-reconfigure -f noninteractive tzdata
+# `tzdata` is required by certbot debian package
+# keep it here just in case of possible exception
 
 WORKDIR     $PATH_APP
 ARG         GIT_CERTBOT=https://github.com/certbot/certbot
