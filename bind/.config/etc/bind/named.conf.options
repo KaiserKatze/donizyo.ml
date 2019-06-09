@@ -1,4 +1,5 @@
-// @see: ftp://ftp.isc.org/isc/bind9/9.8.0-P4/doc/arm/Bv9ARM.ch06.html#options
+// @see: https://ftp.isc.org/isc/bind9/9.14.2/doc/arm/Bv9ARM.ch05.html
+// @see: https://ftp.isc.org/isc/bind9/9.14.2/doc/arm/Bv9ARM.ch06.html
 options {
     directory "/var/cache/bind";
 
@@ -10,9 +11,6 @@ options {
     // nameservers, you probably want to use them as forwarders.
     // Uncomment the following block, and insert the addresses replacing
     // the all-0's placeholder.
-
-    // Do not allow access to cache
-    //allow-query-cache { none; };
 
     //forward only;
     forwarders {
