@@ -15,6 +15,7 @@ start() {
     docker rm -f $(docker ps -a -q)
 
     # create user-defined bridge network
+    # @see: https://docs.docker.com/network/network-tutorial-standalone/
 
     docker network create --driver bridge kknet
     docker network ls
@@ -26,6 +27,7 @@ start() {
     docker run -d \
         -p 127.0.0.1:53:53/udp \
         --name dns \
+        --network kknet \
         bind \
         named -g -4 -u bind
 
@@ -57,6 +59,7 @@ start() {
         -v "/etc/letsencrypt:/etc/letsencrypt" \
         -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
         --name web \
+        --network kknet \
         nginx \
         nginx -g 'daemon off;'
 }
