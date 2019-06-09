@@ -28,8 +28,7 @@ options {
 
     auth-nxdomain no;    # conform to RFC1035
 
-    listen-on port 53 { 127.0.0.1; };
-    listen-on-v6 { none; };
+    include "/etc/bind/named.conf.port";
 
     statistics-file "/var/cache/bind/named.stats";
     rrset-order { order cyclic; };
