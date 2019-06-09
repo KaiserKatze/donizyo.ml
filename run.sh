@@ -14,6 +14,12 @@ start() {
     # delete all containers
     docker rm -f $(docker ps -a -q)
 
+    # create user-defined bridge network
+
+    docker network create --driver bridge kknet
+    docker network ls
+    docker network inspect kknet
+
     # create new containers
 
     # setup dns service
@@ -29,7 +35,7 @@ start() {
     test $(nmap -T4 -p53 -Pn -n 127.0.0.1 | awk 'NR==6' | cut -d' ' -f2) == "open" && \
         echo "nmap test OK." || \
         echo "nmap test failed! BIND9 won't work!"
-    dig @127.0.0.1 . NS | \
+    dig @127.0.0.1 +time=1 . NS | \
         grep "^;; SERVER: 127.0.0.1#53(127.0.0.1)$" && \
         echo "dig test OK." || \
         echo "dig test failed! BIND9 won't work!"
