@@ -23,10 +23,16 @@ start() {
         bind \
         named -g -4 -u bind
 
-    netstat -lnp | grep :53
-    nmap -T4 -p53 127.0.0.1
-    dig @127.0.0.1 . NS
-    dig @127.0.0.1 -x 127.0.0.1
+    netstat -lnp | grep :53 && \
+        echo "netstat test OK." || \
+        echo "netstat test failed! BIND9 won't work!"
+    test $(nmap -T4 -p53 -Pn -n 127.0.0.1 | awk 'NR==6' | cut -d' ' -f2) == "open" && \
+        echo "nmap test OK." || \
+        echo "nmap test failed! BIND9 won't work!"
+    dig @127.0.0.1 . NS | \
+        grep "^;; SERVER: 127.0.0.1#53(127.0.0.1)$" && \
+        echo "dig test OK." || \
+        echo "dig test failed! BIND9 won't work!"
 
     # obtain https certificate
     # @see: https://certbot.eff.org/docs/install.html#running-with-docker
