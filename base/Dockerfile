@@ -19,8 +19,8 @@ RUN         apt-get -y install gnupg
 # Install `ip`
 RUN         apt-get -y install iproute2
 
-# Install unnecessary packages (vim, netstat)
-RUN         apt-get -y install vim net-tools
+# Install unnecessary packages (vim, netstat, ping)
+RUN         apt-get -y install vim net-tools iputils-ping
 
 # install python2.7 on ubuntu:18.04(debian:buster)
 RUN         apt-get -y install python2.7
