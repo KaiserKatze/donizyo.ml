@@ -12,9 +12,9 @@ options {
     // the all-0's placeholder.
 
     // Do not allow access to cache
-    allow-query-cache { none; };
+    //allow-query-cache { none; };
 
-    forward only;
+    //forward only;
     forwarders {
         8.8.8.8;
         8.8.4.4;
