@@ -18,8 +18,9 @@ RUN         echo "Installing necessary packages:" && \
 RUN         apt-get -y install gnupg
 # Install `ip`
 RUN         apt-get -y install iproute2
-# Install editor
-RUN         apt-get -y install vim
+
+# Install unnecessary packages (vim, netstat)
+RUN         apt-get -y install vim net-tools
 
 # install python2.7 on ubuntu:18.04(debian:buster)
 RUN         apt-get -y install python2.7
