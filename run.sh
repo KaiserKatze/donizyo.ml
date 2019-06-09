@@ -23,6 +23,11 @@ start() {
         bind \
         named -g -4 -u bind
 
+    netstat -lnp | grep :53
+    nmap -T4 -p53 127.0.0.1
+    dig @127.0.0.1 . NS
+    dig @127.0.0.1 -x 127.0.0.1
+
     # obtain https certificate
     # @see: https://certbot.eff.org/docs/install.html#running-with-docker
     docker run -it --rm --name certbot \
