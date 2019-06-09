@@ -29,7 +29,9 @@ options {
     dnssec-validation auto;
 
     auth-nxdomain no;    # conform to RFC1035
-    listen-on-v6 { any; };
+
+    listen-on port 53 { 127.0.0.1; };
+    listen-on-v6 { none; };
 
     statistics-file "/var/cache/bind/named.stats";
     rrset-order { order cyclic; };
