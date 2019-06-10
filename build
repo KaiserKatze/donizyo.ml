@@ -34,12 +34,7 @@ easy() {
     # @see: https://unix.stackexchange.com/a/354456/244069
     SECONDS=0
 
-    build base
-    build util
-    build nginx
-    build sqlite
-    build python
-    build bind
+    docker build -t complex .
 
     docker images
 
@@ -56,33 +51,6 @@ easy() {
         timer_msg="Completed in $minutes minute(s) and $seconds second(s)"
     else
         timer_msg="Completed in $SECONDS seconds"
-    fi
-
-    read -p "Do you want to push newly built images? (Y/n) " do_push_images
-    if [ "$do_push_images" == "Y" ] || [ "$do_push_images" == "y" ]; then
-        if [ -z "$DOCKER_USERNAME" ]; then
-            # no username is provided
-            read -s -p "Please input username: " DOCKER_USERNAME
-            echo
-        fi
-        if [ -z "$DOCKER_PASSWORD" ]; then
-            # no password is provided
-            read -s -p "Please input password: " DOCKER_PASSWORD
-            echo
-        fi
-
-        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-        docker tag nginx $DOCKER_USERNAME/nginx && \
-            docker push $DOCKER_USERNAME/nginx
-        docker tag sqlite $DOCKER_USERNAME/sqlite && \
-            docker push $DOCKER_USERNAME/sqlite
-        docker tag python $DOCKER_USERNAME/python && \
-            docker push $DOCKER_USERNAME/python
-        docker tag bind $DOCKER_USERNAME/bind && \
-            docker push $DOCKER_USERNAME/bind
-
-        docker logout
     fi
 
     echo "$timer_msg"
