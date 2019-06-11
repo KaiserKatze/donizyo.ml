@@ -31,6 +31,12 @@ start() {
         bind \
         named -g -4 -u bind
 
+    dns4_service_status=$(ip addr show | awk '/inet /' | grep -Po "inet \K\d+\.\d+\.\d+\.\d+" | xargs nmap -T4 -Pn -n -p53 | grep -Po "53/\w+\s+open")
+    dns6_service_status=$(ip addr show | awk '/inet6/' | grep -Po "inet6 \K[^/]+" | xargs nmap -T4 -Pn -n -6 -p53 | grep -Po "53/\w+\s+open")
+    test -n "$dns4_service_status" || test -n "$dns6_service_status" && \
+        echo "DNS is running ..." || \
+        echo "Fail to serve DNS!" && exit 1
+
     netstat -lnp | grep :53 && \
         echo "netstat test OK." || \
         echo "netstat test failed! BIND9 won't work!"
