@@ -1,2 +1,6 @@
-listen-on port 53 { 127.0.0.1; };
+// do not specify `listen-on` directive
+// unless you know what you are doing
+// listen-on port 53 { 127.0.0.1; };
+
+// disable ipv6
 listen-on-v6 { none; };
