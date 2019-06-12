@@ -27,6 +27,7 @@ push() {
     repo=$DOCKER_USERNAME/$image
     docker tag  $image  $repo
     docker push         $repo
+    docker rmi          $repo
 }
 
 easy() {
@@ -102,6 +103,10 @@ case "$1" in
 
     clean)
     clean
+    ;;
+
+    push)
+    push $2
     ;;
 
     *)
