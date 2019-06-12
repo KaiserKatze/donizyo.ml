@@ -101,5 +101,9 @@ start() {
 }
 
 finalize() {
-    docker rm -f dns
+    containers="dns web"
+    for container in $containers; do
+        docker stop $container
+        docker rm $container
+    done
 }
