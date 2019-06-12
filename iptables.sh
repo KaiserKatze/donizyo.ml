@@ -62,6 +62,9 @@ IPTR="/sbin/iptables-restore"
 
 # Internet Interface
 INET_ADDRESS=$(./get_ext_ip.sh)
+if [ -z "$INET_ADDRESS" ]; then
+    exit 1
+fi
 INET_IFACE=$(ip -4 a | grep -B1 "$INET_ADDRESS" | awk 'NR==1{print $2}' | cut -d: -f1)
 
 # Localhost Interface
