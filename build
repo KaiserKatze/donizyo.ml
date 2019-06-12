@@ -17,6 +17,12 @@ pull() {
     docker rmi  $repo
 }
 
+pull_all() {
+    for image in $@; do
+        pull $image
+    done
+}
+
 build() {
     image=$1
     docker build -t $image ./$image
@@ -124,6 +130,15 @@ case "$1" in
         shift 1
         login_docker_hub
         push_all $@
+        logout_docker_hub
+    fi
+    ;;
+
+    pull)
+    if [ -n "$2" ]; then
+        shift 1
+        login_docker_hub
+        pull_all $@
         logout_docker_hub
     fi
     ;;
