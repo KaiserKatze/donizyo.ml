@@ -37,7 +37,9 @@ disable_docker_firewall() {
 }
 
 start() {
+    # firewall
     disable_docker_firewall
+    ./iptables.sh
 
     service docker restart
 
