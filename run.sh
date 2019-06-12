@@ -39,9 +39,8 @@ disable_docker_firewall() {
 start() {
     # firewall
     disable_docker_firewall
-    ./iptables.sh
-
     service docker restart
+    ./iptables.sh
 
     # delete all containers
     docker rm -f $(docker ps -a -q)
