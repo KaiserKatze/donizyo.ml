@@ -626,6 +626,23 @@ echo "Process FORWARD chain ..."
 
 # Used if forwarding for a private network
 
+# Docker
+$IPT -N DOCKER
+$IPT -N DOCKER-ISOLATION-STAGE-1
+$IPT -N DOCKER-ISOLATION-STAGE-2
+$IPT -N DOCKER-USER
+$IPT -A FORWARD -j DOCKER-USER
+$IPT -A FORWARD -j DOCKER-ISOLATION-STAGE-1
+$IPT -A FORWARD -o docker0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+$IPT -A FORWARD -o docker0 -j DOCKER
+$IPT -A FORWARD -i docker0 ! -o docker0 -j ACCEPT
+$IPT -A FORWARD -i docker0 -o docker0 -j ACCEPT
+$IPT -A DOCKER-ISOLATION-STAGE-1 -i docker0 ! -o docker0 -j DOCKER-ISOLATION-STAGE-2
+$IPT -A DOCKER-ISOLATION-STAGE-1 -j RETURN
+$IPT -A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
+$IPT -A DOCKER-ISOLATION-STAGE-2 -j RETURN
+$IPT -A DOCKER-USER -j RETURN
+
 
 ###############################################################################
 #
@@ -666,17 +683,39 @@ $IPT -A OUTPUT -j LOG --log-prefix "fp=OUTPUT:99 a=DROP "
 
 echo "Load rules for nat table ..."
 
+# Docker
+$IPT -t nat -N DOCKER
+
 ###############################################################################
 #
 # PREROUTING chain
 #
 
+# Docker
+$IPT -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
+
+###############################################################################
+#
+# INPUT chain
+#
+
+
+###############################################################################
+#
+# OUTPUT chain
+#
+
+# Docker
+$IPT -t nat -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
+$IPT -t nat -A DOCKER -i docker0 -j RETURN
 
 ###############################################################################
 #
 # POSTROUTING chain
 #
 
+# Docker
+$IPT -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
 
 ###############################################################################
 #
