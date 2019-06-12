@@ -75,6 +75,7 @@ LO_IFACE=$(ip -4 a | grep -B1 "$LO_IP" | awk 'NR==1{print $2}' | cut -d: -f1)
 if [ -z "$LO_IFACE" ]; then exit 1; fi
 
 # Save and Restore arguments handled here
+mkdir -p /etc/sysconfig
 if [ "$1" = "save" ]
 then
 	echo -n "Saving firewall to /etc/sysconfig/iptables ... "
