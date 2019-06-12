@@ -10,6 +10,34 @@ trap onerror ERR
 
 # setup firewall before docker does so
 
+disable_docker_firewall() {
+    cat > /etc/default/docker <<- EOF
+    # Docker Upstart and SysVinit configuration file
+
+    #
+    # THIS FILE DOES NOT APPLY TO SYSTEMD
+    #
+    #   Please see the documentation for "systemd drop-ins":
+    #   https://docs.docker.com/engine/admin/systemd/
+    #
+
+    # Customize location of Docker binary (especially for development testing).
+    #DOCKERD="/usr/local/bin/dockerd"
+
+    # Use DOCKER_OPTS to modify the daemon startup options.
+    #DOCKER_OPTS="--dns 8.8.8.8 --dns 8.8.4.4"
+    DOCKER_OPTS="--iptables=false"
+
+    # If you need Docker to use an HTTP proxy, it can also be specified here.
+    #export http_proxy="http://127.0.0.1:3128/"
+
+    # This is also a handy place to tweak where Docker's temporary files go.
+    #export DOCKER_TMPDIR="/mnt/bigdrive/docker-tmp"
+    EOF
+
+    service docker restart
+}
+
 start() {
     # delete all containers
     docker rm -f $(docker ps -a -q)
