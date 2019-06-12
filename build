@@ -30,6 +30,31 @@ push() {
     docker rmi          $repo
 }
 
+push_all() {
+    for image in $@; do
+        push $image
+    done
+}
+
+login_docker_hub() {
+    if [ -z "$DOCKER_USERNAME" ]; then
+        # no username is provided
+        read -s -p "Please input username: " DOCKER_USERNAME
+        echo
+    fi
+    if [ -z "$DOCKER_PASSWORD" ]; then
+        # no password is provided
+        read -s -p "Please input password: " DOCKER_PASSWORD
+        echo
+    fi
+
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+}
+
+logout_docker_hub() {
+    docker logout
+}
+
 easy() {
     # start timer
     # @see: https://unix.stackexchange.com/a/354456/244069
@@ -61,18 +86,7 @@ easy() {
 
     read -p "Do you want to push newly built images? (Y/n) " do_push_images
     if [ "$do_push_images" == "Y" ] || [ "$do_push_images" == "y" ]; then
-        if [ -z "$DOCKER_USERNAME" ]; then
-            # no username is provided
-            read -s -p "Please input username: " DOCKER_USERNAME
-            echo
-        fi
-        if [ -z "$DOCKER_PASSWORD" ]; then
-            # no password is provided
-            read -s -p "Please input password: " DOCKER_PASSWORD
-            echo
-        fi
-
-        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        login_docker_hub
 
         docker tag nginx $DOCKER_USERNAME/nginx && \
             docker push $DOCKER_USERNAME/nginx
@@ -83,7 +97,7 @@ easy() {
         docker tag bind $DOCKER_USERNAME/bind && \
             docker push $DOCKER_USERNAME/bind
 
-        docker logout
+        logout_docker_hub
     fi
 
     echo "$timer_msg"
@@ -106,7 +120,12 @@ case "$1" in
     ;;
 
     push)
-    push $2
+    if [ -n "$2" ]; then
+        shift 1
+        login_docker_hub
+        push_all $@
+        logout_docker_hub
+    fi
     ;;
 
     *)
