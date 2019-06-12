@@ -88,7 +88,7 @@ start() {
         certbot/certbot certonly
 
     # setup web service
-    docker run -d \
+    docker run -dit \
         -p 127.0.0.1:80:80/tcp \
         -p 127.0.0.1:443:443/tcp \
         -p 127.0.0.1:1935:1935/tcp \
@@ -96,8 +96,8 @@ start() {
         -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
         --name web \
         --network kknet \
-        nginx \
-        nginx -g 'daemon off;'
+        nginx bash
+    docker exec -d web nginx
 }
 
 finalize() {
