@@ -694,6 +694,11 @@ $IPT -A OUTPUT -j LOG --log-prefix "fp=OUTPUT:99 a=DROP "
 
 echo "Load rules for nat table ..."
 
+$IPT -t nat -P PREROUTING ACCEPT
+$IPT -t nat -P INPUT ACCEPT
+$IPT -t nat -P OUTPUT ACCEPT
+$IPT -t nat -P POSTROUTING ACCEPT
+
 # Docker
 $IPT -t nat -N DOCKER
 
@@ -746,3 +751,8 @@ $IPT -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
 
 echo "Load rules for mangle table ..."
 
+$IPT -t mangle -P PREROUTING ACCEPT
+$IPT -t mangle -P INPUT ACCEPT
+$IPT -t mangle -P FORWARD ACCEPT
+$IPT -t mangle -P OUTPUT ACCEPT
+$IPT -t mangle -P POSTROUTING ACCEPT
