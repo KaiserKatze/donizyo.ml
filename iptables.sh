@@ -643,6 +643,7 @@ then
     $IPT -N DOCKER-ISOLATION-STAGE-2
     $IPT -N DOCKER-USER
 
+    networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
     if [ -n "$networks" ];
     then
     for network in $networks;
