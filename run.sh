@@ -55,6 +55,13 @@ disable_docker_firewall() {
 }
 
 start() {
+    # create user-defined bridge network
+    # @see: https://docs.docker.com/network/network-tutorial-standalone/
+
+    docker network create --driver bridge kknet
+    docker network ls
+    docker network inspect kknet
+
     # firewall
     disable_docker_firewall
     service docker restart
@@ -62,13 +69,6 @@ start() {
 
     # delete all containers
     docker rm -f $(docker ps -a -q)
-
-    # create user-defined bridge network
-    # @see: https://docs.docker.com/network/network-tutorial-standalone/
-
-    docker network create --driver bridge kknet
-    docker network ls
-    docker network inspect kknet
 
     # create new containers
 
