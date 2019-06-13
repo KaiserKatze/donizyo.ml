@@ -722,6 +722,19 @@ echo "Load rules for nat table ..."
 
 if [ -n "$IS_DOCKER_INSTALLED" ];
 then
+    $IPT -t nat -N DOCKER
+
+    # PREROUTING chain
+    $IPT -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
+
+    # OUTPUT chain
+    $IPT -t nat -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
+    $IPT -t nat -A DOCKER -i docker0 -j RETURN
+
+    # POSTROUTING chain
+    $IPT -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+
+    # Docker networks
     networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
     if [ -n "$networks" ];
     then
@@ -739,22 +752,11 @@ then
     fi
 fi
 
-# Docker
-if [ -n "$IS_DOCKER_INSTALLED" ];
-then
-    $IPT -t nat -N DOCKER
-fi
-
 ###############################################################################
 #
 # PREROUTING chain
 #
 
-# Docker
-if [ -n "$IS_DOCKER_INSTALLED" ];
-then
-    $IPT -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
-fi
 
 ###############################################################################
 #
@@ -767,23 +769,12 @@ fi
 # OUTPUT chain
 #
 
-# Docker
-if [ -n "$IS_DOCKER_INSTALLED" ];
-then
-    $IPT -t nat -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
-    $IPT -t nat -A DOCKER -i docker0 -j RETURN
-fi
 
 ###############################################################################
 #
 # POSTROUTING chain
 #
 
-# Docker
-if [ -n "$IS_DOCKER_INSTALLED" ];
-then
-    $IPT -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
-fi
 
 ###############################################################################
 #
