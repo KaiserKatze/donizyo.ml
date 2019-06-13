@@ -719,6 +719,26 @@ $IPT -A OUTPUT -j LOG --log-prefix "fp=OUTPUT:99 a=DROP "
 
 echo "Load rules for nat table ..."
 
+
+if [ -n "$IS_DOCKER_INSTALLED" ];
+then
+    networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
+    if [ -n "$networks" ];
+    then
+    for network in $networks;
+    do
+        network_id=$(docker network inspect $network | awk '/"Id"/{print $2}' | cut -d'"' -f2)
+        network_short_id=${network_id:0:12}
+        iface_name="br-"$network_short_id
+        iface_addr=$(ip -4 addr show | awk '/inet/{print $2 " " $7}' | grep $iface_name | cut -d'/' -f1)
+        iface_iprange=$(echo $iface_addr | cut -d'.' -f1-3)".0/16"
+
+        $IPT -t nat -A POSTROUTING -s $iface_iprange ! -o $iface_name -j MASQUERADE
+        $IPT -t nat -A DOCKER -i $iface_name -j RETURN
+    done
+    fi
+fi
+
 # Docker
 if [ -n "$IS_DOCKER_INSTALLED" ];
 then
