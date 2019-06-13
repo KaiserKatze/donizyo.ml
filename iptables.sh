@@ -316,6 +316,11 @@ $IPT -X
 $IPT -t nat -X
 $IPT -t mangle -X
 
+# Zero the packet and byte counters in all chains
+$IPT -Z
+$IPT -t nat -Z
+$IPT -t mangle -Z
+
 if [ "$1" = "stop" ]
 then
 	echo "Firewall completely flushed!  Now running with no firewall."
