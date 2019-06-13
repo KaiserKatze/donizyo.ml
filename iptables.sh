@@ -643,6 +643,26 @@ then
     $IPT -N DOCKER-ISOLATION-STAGE-2
     $IPT -N DOCKER-USER
 
+    if [ -n "$networks" ];
+    then
+    for network in $networks;
+    do
+        network_id=$(docker network inspect $network | awk '/"Id"/{print $2}' | cut -d'"' -f2)
+        network_short_id=${network_id:0:12}
+        iface_name="br-"$network_short_id
+
+        $IPT -A FORWARD -o $iface_name -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+        $IPT -A FORWARD -o $iface_name -j DOCKER
+        $IPT -A FORWARD -i $iface_name ! -o $iface_name -j ACCEPT
+        $IPT -A FORWARD -i $iface_name -o $iface_name -j ACCEPT
+
+        $IPT -A DOCKER-ISOLATION-STAGE-1 -i $iface_name ! -o $iface_name -j DOCKER-ISOLATION-STAGE-2
+        $IPT -A DOCKER-ISOLATION-STAGE-2 -o $iface_name -j DROP
+    done
+    fi
+
+
+
     $IPT -A FORWARD -j DOCKER-USER
     $IPT -A DOCKER-USER -j RETURN
 
