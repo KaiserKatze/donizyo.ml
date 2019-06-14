@@ -666,6 +666,14 @@ then
     $IPT -N DOCKER-ISOLATION-STAGE-2
     $IPT -N DOCKER-USER
 
+    $IPT -A FORWARD -j DOCKER-USER
+    $IPT -A FORWARD -j DOCKER-ISOLATION-STAGE-1
+
+    $IPT -A FORWARD -o docker0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    $IPT -A FORWARD -o docker0 -j DOCKER
+    $IPT -A FORWARD -i docker0 ! -o docker0 -j ACCEPT
+    $IPT -A FORWARD -i docker0 -o docker0 -j ACCEPT
+
     networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
     if [ -n "$networks" ];
     then
@@ -687,19 +695,13 @@ then
 
 
 
-    $IPT -A FORWARD -j DOCKER-USER
     $IPT -A DOCKER-USER -j RETURN
 
-    $IPT -A FORWARD -j DOCKER-ISOLATION-STAGE-1
     $IPT -A DOCKER-ISOLATION-STAGE-1 -i docker0 ! -o docker0 -j DOCKER-ISOLATION-STAGE-2
     $IPT -A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
     $IPT -A DOCKER-ISOLATION-STAGE-2 -j RETURN
     $IPT -A DOCKER-ISOLATION-STAGE-1 -j RETURN
 
-    $IPT -A FORWARD -o docker0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    $IPT -A FORWARD -o docker0 -j DOCKER
-    $IPT -A FORWARD -i docker0 ! -o docker0 -j ACCEPT
-    $IPT -A FORWARD -i docker0 -o docker0 -j ACCEPT
 fi
 
 
