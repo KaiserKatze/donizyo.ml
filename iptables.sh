@@ -725,6 +725,8 @@ then
     $IPT -t nat -N DOCKER
 
     # PREROUTING chain
+    # `LOCAL` refers to any address assigned to an interface
+    # try `ip addr show | awk '/inet/{print $2}' | cut -d'/' -f1`
     $IPT -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
 
     # OUTPUT chain
