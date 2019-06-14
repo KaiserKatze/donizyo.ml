@@ -747,8 +747,7 @@ then
             network_id=$(docker network inspect $network | awk '/"Id"/{print $2}' | cut -d'"' -f2)
             network_short_id=${network_id:0:12}
             iface_name="br-"$network_short_id
-            iface_addr=$(ip -4 addr show | awk '/inet/{print $2 " " $7}' | grep $iface_name | cut -d'/' -f1)
-            iface_iprange=$(echo $iface_addr | cut -d'.' -f1-3)".0/16"
+            iface_iprange=$(docker network inspect $network | awk '/Subnet/{print $2}' | cut -d'"' -f2)
 
             $IPT -t nat -A POSTROUTING -s $iface_iprange ! -o $iface_name -j MASQUERADE
             $IPT -t nat -A DOCKER -i $iface_name -j RETURN
