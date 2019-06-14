@@ -280,6 +280,29 @@ fi
 # Detect if Docker is installed
 IS_DOCKER_INSTALLED=$(which docker)
 
+if [ -n "$IS_DOCKER_INSTALLED" ];
+then
+
+    # by default, `$iface_iprange_bridge` should be '172.17.0.0/16'
+    # and `$iface_name_bridge` should be 'docker0'
+    # hereby we replace it with variable just in case docker or user changes it
+    iface_iprange_bridge=$(docker network inspect bridge | awk '/Subnet/{print $2}' | cut -d'"' -f2)
+    iface_name_bridge=$(docker network inspect bridge | awk '/com.docker.network.bridge.name/{print $2}' | cut -d'"' -f2)
+
+    # assign a default value, in case the retrieved value of `iface_iprange_bridge` or `iface_name_bridge` is empty
+    if [ -z "$iface_iprange_bridge" ];
+    then
+        iface_iprange_bridge=172.17.0.0/16
+        ip addr show | grep $iface_iprange_bridge || exit 1
+    fi
+    if [ -z "$iface_name_bridge" ];
+    then
+        iface_name_bridge=docker0
+        ip addr show | grep $iface_name_bridge || exit 1
+    fi
+
+fi
+
 
 ###############################################################################
 #
@@ -733,23 +756,6 @@ then
     $IPT -t nat -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
 
     # POSTROUTING chain
-    # by default, `$iface_iprange_bridge` should be '172.17.0.0/16'
-    # and `$iface_name_bridge` should be 'docker0'
-    # hereby we replace it with variable just in case docker or user changes it
-    iface_iprange_bridge=$(docker network inspect bridge | awk '/Subnet/{print $2}' | cut -d'"' -f2)
-    iface_name_bridge=$(docker network inspect bridge | awk '/com.docker.network.bridge.name/{print $2}' | cut -d'"' -f2)
-
-    # assign a default value, in case the retrieved value of `iface_iprange_bridge` or `iface_name_bridge` is empty
-    if [ -z "$iface_iprange_bridge" ];
-    then
-        iface_iprange_bridge=172.17.0.0/16
-        ip addr show | grep $iface_iprange_bridge || exit 1
-    fi
-    if [ -z "$iface_name_bridge" ];
-    then
-        iface_name_bridge=docker0
-        ip addr show | grep $iface_name_bridge || exit 1
-    fi
 
     #$IPT -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
     $IPT -t nat -A POSTROUTING -s $iface_iprange_bridge ! -o $iface_name_bridge -j MASQUERADE
