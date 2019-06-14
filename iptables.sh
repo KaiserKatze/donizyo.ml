@@ -60,6 +60,22 @@ IPT="/sbin/iptables"
 IPTS="/sbin/iptables-save"
 IPTR="/sbin/iptables-restore"
 
+# Save and Restore arguments handled here
+mkdir -p /etc/sysconfig
+if [ "$1" = "save" ]
+then
+    echo -n "Saving firewall to /etc/sysconfig/iptables ... "
+    $IPTS > /etc/sysconfig/iptables
+    echo "done"
+    exit 0
+elif [ "$1" = "restore" ]
+then
+    echo -n "Restoring firewall from /etc/sysconfig/iptables ... "
+    $IPTR < /etc/sysconfig/iptables
+    echo "done"
+    exit 0
+fi
+
 # Internet Interface
 if [ -z "$INET_ADDRESS" ]; then
     INET_ADDRESS=$(./get_ext_ip.sh)
@@ -73,22 +89,6 @@ if [ -z "$INET_IFACE" ]; then exit 1; fi
 LO_IP="127.0.0.1"
 LO_IFACE=$(ip -4 a | grep -B1 "$LO_IP" | awk 'NR==1{print $2}' | cut -d: -f1)
 if [ -z "$LO_IFACE" ]; then exit 1; fi
-
-# Save and Restore arguments handled here
-mkdir -p /etc/sysconfig
-if [ "$1" = "save" ]
-then
-	echo -n "Saving firewall to /etc/sysconfig/iptables ... "
-	$IPTS > /etc/sysconfig/iptables
-	echo "done"
-	exit 0
-elif [ "$1" = "restore" ]
-then
-	echo -n "Restoring firewall from /etc/sysconfig/iptables ... "
-	$IPTR < /etc/sysconfig/iptables
-	echo "done"
-	exit 0
-fi
 
 ###############################################################################
 #
