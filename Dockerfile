@@ -54,15 +54,7 @@ RUN         make
 RUN         make install
 
 # perl5
-WORKDIR     $PATH_APP
-RUN         git clone -q --depth 1 --single-branch --branch $VERSION_PERL -- $GIT_PERL perl
-WORKDIR     $PATH_APP/perl
-RUN         ./Configure -des \
-                -Dprefix=$PERL_PREFIX \
-                -Dusethreads
-RUN         make
-RUN         make test || echo "Fail perl test!"
-RUN         make install
+RUN         apk add perl
 
 # openssl
 WORKDIR     $PATH_APP
