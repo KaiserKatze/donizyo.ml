@@ -277,6 +277,11 @@ else
     $SYSCTL net.ipv4.conf.all.log_martians="1"
 fi
 
+###############################################################################
+#
+# Docker
+#
+
 # Detect if Docker is installed
 IS_DOCKER_INSTALLED=$(which docker)
 
@@ -303,6 +308,30 @@ then
 
 fi
 
+list_docker_networks() {
+    dir_log_docker_networks=/tmp/docker
+    path_log_docker_networks=$dir_log_docker_networks/networks.txt
+    mkdir -p $dir_log_docker_networks
+    rm -f $path_log_docker_networks
+    touch $path_log_docker_networks
+
+    # list all user-defined networks for docker
+    networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
+    if [ -n "$networks" ];
+    then
+        for network in $networks;
+        do
+            network_id=$(docker network inspect $network | awk '/"Id"/{print $2}' | cut -d'"' -f2)
+            network_short_id=${network_id:0:12}
+            iface_name="br-"$network_short_id
+            iface_iprange=$(docker network inspect $network | awk '/Subnet/{print $2}' | cut -d'"' -f2)
+
+            echo "$iface_name $iface_iprange" >> $path_log_docker_networks
+        done
+    fi
+
+    rm -rf $dir_log_docker_networks
+}
 
 ###############################################################################
 #
@@ -674,34 +703,27 @@ then
     $IPT -A FORWARD -i docker0 ! -o docker0 -j ACCEPT
     $IPT -A FORWARD -i docker0 -o docker0 -j ACCEPT
 
-    networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
-    if [ -n "$networks" ];
-    then
-    for network in $networks;
-    do
-        network_id=$(docker network inspect $network | awk '/"Id"/{print $2}' | cut -d'"' -f2)
-        network_short_id=${network_id:0:12}
-        iface_name="br-"$network_short_id
+    list_docker_networks
 
-        $IPT -A FORWARD -o $iface_name -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-        $IPT -A FORWARD -o $iface_name -j DOCKER
-        $IPT -A FORWARD -i $iface_name ! -o $iface_name -j ACCEPT
-        $IPT -A FORWARD -i $iface_name -o $iface_name -j ACCEPT
-
-        $IPT -A DOCKER-ISOLATION-STAGE-1 -i $iface_name ! -o $iface_name -j DOCKER-ISOLATION-STAGE-2
-        $IPT -A DOCKER-ISOLATION-STAGE-2 -o $iface_name -j DROP
-    done
-    fi
-
-
-
-    $IPT -A DOCKER-USER -j RETURN
+    cat $path_log_docker_networks | awk '{print \
+        "$IPT -A FORWARD -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT" "\n" \
+        "$IPT -A FORWARD -o "$1" -j DOCKER" "\n" \
+        "$IPT -A FORWARD -i "$1" ! -o "$1" -j ACCEPT" "\n" \
+        "$IPT -A FORWARD -i "$1" -o "$1" -j ACCEPT"}' | bash
 
     $IPT -A DOCKER-ISOLATION-STAGE-1 -i docker0 ! -o docker0 -j DOCKER-ISOLATION-STAGE-2
-    $IPT -A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
-    $IPT -A DOCKER-ISOLATION-STAGE-2 -j RETURN
-    $IPT -A DOCKER-ISOLATION-STAGE-1 -j RETURN
 
+    cat $path_log_docker_networks | awk '{print \
+        "$IPT -A DOCKER-ISOLATION-STAGE-1 -i "$1" ! -o "$1" -j DOCKER-ISOLATION-STAGE-2"}' | bash
+
+    $IPT -A DOCKER-ISOLATION-STAGE-1 -j RETURN
+    $IPT -A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
+
+    cat $path_log_docker_networks | awk '{print \
+        "$IPT -A DOCKER-ISOLATION-STAGE-2 -o "$1" -j DROP"}' | bash
+
+    $IPT -A DOCKER-ISOLATION-STAGE-2 -j RETURN
+    $IPT -A DOCKER-USER -j RETURN
 fi
 
 
@@ -764,26 +786,7 @@ then
 
     # Docker networks
 
-    # prepare logging
-    dir_log_docker_networks=/tmp/docker
-    path_log_docker_networks=$dir_log_docker_networks/networks.txt
-    mkdir -p $dir_log_docker_networks
-    rm -f $path_log_docker_networks
-    touch $path_log_docker_networks
-    # list all user-defined networks for docker
-    networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
-    if [ -n "$networks" ];
-    then
-        for network in $networks;
-        do
-            network_id=$(docker network inspect $network | awk '/"Id"/{print $2}' | cut -d'"' -f2)
-            network_short_id=${network_id:0:12}
-            iface_name="br-"$network_short_id
-            iface_iprange=$(docker network inspect $network | awk '/Subnet/{print $2}' | cut -d'"' -f2)
-
-            echo "$iface_name $iface_iprange" >> $path_log_docker_networks
-        done
-    fi
+    list_docker_networks
 
     cat $path_log_docker_networks | awk '{print"$IPT -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
 
@@ -791,9 +794,6 @@ then
     $IPT -t nat -A DOCKER -i $iface_name_bridge -j RETURN
 
     cat $path_log_docker_networks | awk '{print"$IPT -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
-
-    # clean up logging
-    rm -rf $dir_log_docker_networks
 fi
 
 ###############################################################################
