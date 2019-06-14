@@ -734,11 +734,35 @@ then
 
     # POSTROUTING chain
     # by default, `$iface_iprange_bridge` should be '172.17.0.0/16'
+    # and `$iface_name_bridge` should be 'docker0'
     # hereby we replace it with variable just in case docker or user changes it
     iface_iprange_bridge=$(docker network inspect bridge | awk '/Subnet/{print $2}' | cut -d'"' -f2)
-    $IPT -t nat -A POSTROUTING -s $iface_iprange_bridge ! -o docker0 -j MASQUERADE
+    iface_name_bridge=$(docker network inspect bridge | awk '/com.docker.network.bridge.name/{print $2}' | cut -d'"' -f2)
+
+    # assign a default value, in case the retrieved value of `iface_iprange_bridge` or `iface_name_bridge` is empty
+    if [ -z "$iface_iprange_bridge" ];
+    then
+        iface_iprange_bridge=172.17.0.0/16
+        ip addr show | grep $iface_iprange_bridge || exit 1
+    fi
+    if [ -z "$iface_name_bridge" ];
+    then
+        iface_name_bridge=docker0
+        ip addr show | grep $iface_name_bridge || exit 1
+    fi
+
+    #$IPT -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+    $IPT -t nat -A POSTROUTING -s $iface_iprange_bridge ! -o $iface_name_bridge -j MASQUERADE
 
     # Docker networks
+
+    # prepare logging
+    dir_log_docker_networks=/tmp/docker
+    path_log_docker_networks=$dir_log_docker_networks/networks.txt
+    mkdir -p $dir_log_docker_networks
+    rm -f $path_log_docker_networks
+    touch $path_log_docker_networks
+    # list all user-defined networks for docker
     networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
     if [ -n "$networks" ];
     then
@@ -749,13 +773,19 @@ then
             iface_name="br-"$network_short_id
             iface_iprange=$(docker network inspect $network | awk '/Subnet/{print $2}' | cut -d'"' -f2)
 
-            $IPT -t nat -A POSTROUTING -s $iface_iprange ! -o $iface_name -j MASQUERADE
-            $IPT -t nat -A DOCKER -i $iface_name -j RETURN
+            echo "$iface_name $iface_iprange" >> $path_log_docker_networks
         done
     fi
 
-    # DOCKER chain
-    $IPT -t nat -A DOCKER -i docker0 -j RETURN
+    cat $path_log_docker_networks | awk '{print"$IPT -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
+
+    #$IPT -t nat -A DOCKER -i docker0 -j RETURN
+    $IPT -t nat -A DOCKER -i $iface_name_bridge -j RETURN
+
+    cat $path_log_docker_networks | awk '{print"$IPT -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
+
+    # clean up logging
+    rm -rf $dir_log_docker_networks
 fi
 
 ###############################################################################
