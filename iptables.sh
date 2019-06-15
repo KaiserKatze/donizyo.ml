@@ -122,6 +122,7 @@ then
         sed -e /^$PORT_SSH\\b/d \
             -e /^80\\b/d \
             -e /^443\\b/d)
+    echo $unknown_active_ports
     read -p "Please input port number(s) to allow inbound/outbound tcp/udp packets through: " enabled_misc_ports
 fi
 
