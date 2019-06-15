@@ -867,14 +867,14 @@ then
     # try `ip addr show | awk '/inet/{print $2}' | cut -d'/' -f1`
 
     $IPT -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j LOG \
-        --log-prefix "fp=docker:nat:1 a=DOCKER "
+        --log-prefix "fp=NAT:DOCKER:1 a=DOCKER "
     $IPT -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
 
     # OUTPUT chain
 
     # all locally-generated packets destined to local address(es) will be directed to chain DOCKER
     $IPT -t nat -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j LOG \
-        --log-prefix "fp=docker:nat:2 a=DOCKER "
+        --log-prefix "fp=NAT:DOCKER:2 a=DOCKER "
     $IPT -t nat -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
 
     # POSTROUTING chain
@@ -882,7 +882,7 @@ then
     # all packets from internal address(es) behind gateway `docker0` presumably will be masqueraded
     #$IPT -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
     $IPT -t nat -A POSTROUTING -s $iface_iprange_bridge ! -o $iface_name_bridge -j LOG \
-        --log-prefix "fp=docker:nat:3 a=MASQUERADE "
+        --log-prefix "fp=NAT:DOCKER:3 a=MASQUERADE "
     $IPT -t nat -A POSTROUTING -s $iface_iprange_bridge ! -o $iface_name_bridge -j MASQUERADE
 
     # Docker networks
@@ -893,7 +893,7 @@ then
     cat $path_log_docker_networks | \
         awk -v run_iptables=$IPT '{print \
             "run_iptables -t nat -A POSTROUTING -s "$2" ! -o "$1" -j LOG \
-                --log-prefix \"fp=docker:nat:4 a=MASQUERADE \"" "\n" \
+                --log-prefix \"fp=NAT:DOCKER:4 a=MASQUERADE \"" "\n" \
             "run_iptables -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
 
     # all packets coming in through interface `docker0` presumably will be accepted
