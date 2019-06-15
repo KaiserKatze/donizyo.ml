@@ -665,6 +665,8 @@ $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 80 -j ACCEPT
 $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 443 -j ACCEPT
 
 # sshd
+$IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j LOG \
+    --log-prefix "fp=ssh:1 a=ACCEPT "
 $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j ACCEPT
 
 # User specified allowed TCP protocol
