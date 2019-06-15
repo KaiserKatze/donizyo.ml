@@ -106,6 +106,19 @@ then
     if [ -z "$PORT_SSH" ]; then PORT_SSH=22; fi
 fi
 
+enabled_misc_ports=
+if [ "$DEBIAN_FRONTEND" != "noninteractive" ];
+then
+    # detect other active ports on all interface(0.0.0.0)
+    open_ports=$(netstat -tuan | awk 'NR>2{print $4}' | \
+        awk -F: '/0\.0\.0\.0/{print $2}' | \
+        sed -e '/^22$/d' \
+            -e '/^80$/d' \
+            -e '/^443$/d')
+    echo "Unknown active ports detected:\n"$open_ports
+    read -p "Please input port number(s) to allow inbound/outbound tcp/udp packets through: " enabled_misc_ports
+fi
+
 ###############################################################################
 #
 # Load Modules
