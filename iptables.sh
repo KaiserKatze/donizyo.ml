@@ -77,12 +77,14 @@ then
 fi
 
 # Internet Interface
+echo "Finding external interface ..."
 if [ -z "$INET_ADDRESS" ]; then
     INET_ADDRESS=$(./get_ext_ip.sh)
 fi
 if [ -z "$INET_ADDRESS" ]; then exit 1; fi
 INET_IFACE=$(ip -4 a | grep -B1 "$INET_ADDRESS" | awk 'NR==1{print $2}' | cut -d: -f1)
 if [ -z "$INET_IFACE" ]; then exit 1; fi
+echo "External interface: $INET_IFACE $INET_ADDRESS"
 
 # Localhost Interface
 
@@ -94,6 +96,7 @@ if [ -z "$LO_IFACE" ]; then exit 1; fi
 PORT_SSH=22
 # try to parse sshd config and figure out true port on which sshd listens
 path_sshd_config=/etc/ssh/sshd_config
+echo "Parse '$path_sshd_config' to retrieve SSH port ..."
 if [ -f "$path_sshd_config" ];
 then
     sshd_listen_addr=$(cat $path_sshd_config | awk '/^\s*ListenAddress/{print $2}')
