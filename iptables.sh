@@ -90,6 +90,9 @@ LO_IP="127.0.0.1"
 LO_IFACE=$(ip -4 a | grep -B1 "$LO_IP" | awk 'NR==1{print $2}' | cut -d: -f1)
 if [ -z "$LO_IFACE" ]; then exit 1; fi
 
+# there is no need to publish SSH on port 22
+PORT_SSH=22
+
 ###############################################################################
 #
 # Load Modules
@@ -612,7 +615,7 @@ $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 80 -j ACCEPT
 $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 443 -j ACCEPT
 
 # sshd
-$IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 22 -j ACCEPT
+$IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j ACCEPT
 
 
 # Not matched, so return so it will be logged
