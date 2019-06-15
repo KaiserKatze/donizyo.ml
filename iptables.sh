@@ -345,8 +345,6 @@ list_docker_networks() {
             echo "$iface_name $iface_iprange" >> $path_log_docker_networks
         done
     fi
-
-    rm -rf $dir_log_docker_networks
 }
 
 ###############################################################################
