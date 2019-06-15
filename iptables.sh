@@ -789,27 +789,27 @@ then
 
     list_docker_networks
 
-    cat $path_log_docker_networks | awk '{print \
-        "$IPT -A FORWARD -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT" "\n" \
-        "$IPT -A FORWARD -o "$1" -j DOCKER" "\n" \
-        "$IPT -A FORWARD -i "$1" ! -o "$1" -j ACCEPT" "\n" \
-        "$IPT -A FORWARD -i "$1" -o "$1" -j ACCEPT"}' | bash
+    cat $path_log_docker_networks | awk -v run_iptables=$IPT '{print \
+        "run_iptables -A FORWARD -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT" "\n" \
+        "run_iptables -A FORWARD -o "$1" -j DOCKER" "\n" \
+        "run_iptables -A FORWARD -i "$1" ! -o "$1" -j ACCEPT" "\n" \
+        "run_iptables -A FORWARD -i "$1" -o "$1" -j ACCEPT"}' | bash
 
     # packets destined to docker gateways,
     # but not originated from them,
     # goes to chain DOCKER-ISOLATION-STAGE-2
     #$IPT -A DOCKER-ISOLATION-STAGE-1 -i docker0 ! -o docker0 -j DOCKER-ISOLATION-STAGE-2
     $IPT -A DOCKER-ISOLATION-STAGE-1 -i $iface_name_bridge ! -o $iface_name_bridge -j DOCKER-ISOLATION-STAGE-2
-    cat $path_log_docker_networks | awk '{print \
-        "$IPT -A DOCKER-ISOLATION-STAGE-1 -i "$1" ! -o "$1" -j DOCKER-ISOLATION-STAGE-2"}' | bash
+    cat $path_log_docker_networks | awk -v run_iptables=$IPT '{print \
+        "run_iptables -A DOCKER-ISOLATION-STAGE-1 -i "$1" ! -o "$1" -j DOCKER-ISOLATION-STAGE-2"}' | bash
 
     $IPT -A DOCKER-ISOLATION-STAGE-1 -j RETURN
 
     # packets originated from docker gateways will be dropped
     #$IPT -A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
     $IPT -A DOCKER-ISOLATION-STAGE-2 -o $iface_name_bridge -j DROP
-    cat $path_log_docker_networks | awk '{print \
-        "$IPT -A DOCKER-ISOLATION-STAGE-2 -o "$1" -j DROP"}' | bash
+    cat $path_log_docker_networks | awk -v run_iptables=$IPT '{print \
+        "run_iptables -A DOCKER-ISOLATION-STAGE-2 -o "$1" -j DROP"}' | bash
 
     $IPT -A DOCKER-ISOLATION-STAGE-2 -j RETURN
     $IPT -A DOCKER-USER -j RETURN
@@ -891,10 +891,10 @@ then
 
     # all packets from internal address(es) behind gateway of user-defined network will be masqueraded
     cat $path_log_docker_networks | \
-        awk '{print \
-            "$IPT -t nat -A POSTROUTING -s "$2" ! -o "$1" -j LOG \
+        awk -v run_iptables=$IPT '{print \
+            "run_iptables -t nat -A POSTROUTING -s "$2" ! -o "$1" -j LOG \
                 --log-prefix \"fp=docker:nat:4 a=MASQUERADE \"" "\n" \
-            "$IPT -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
+            "run_iptables -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
 
     # all packets coming in through interface `docker0` presumably will be accepted
     #$IPT -t nat -A DOCKER -i docker0 -j RETURN
@@ -902,7 +902,7 @@ then
 
     # all packets coming in through interface of user-defined network will be accepted
     cat $path_log_docker_networks | \
-        awk '{print"$IPT -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
+        awk -v run_iptables=$IPT '{print"run_iptables -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
 fi
 
 ###############################################################################
