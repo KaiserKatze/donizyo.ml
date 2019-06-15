@@ -108,6 +108,7 @@ then
     if [ -z "$PORT_SSH" ]; then PORT_SSH=$sshd_default_port; fi
     if [ -z "$PORT_SSH" ]; then PORT_SSH=22; fi
 fi
+echo "SSH port: $PORT_SSH"
 
 enabled_misc_ports=
 if [ "$DEBIAN_FRONTEND" != "noninteractive" ];
