@@ -802,12 +802,14 @@ then
 
     list_docker_networks
 
-    cat $path_log_docker_networks | awk '{print"$IPT -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
+    cat $path_log_docker_networks | \
+        awk '{print"$IPT -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
 
     #$IPT -t nat -A DOCKER -i docker0 -j RETURN
     $IPT -t nat -A DOCKER -i $iface_name_bridge -j RETURN
 
-    cat $path_log_docker_networks | awk '{print"$IPT -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
+    cat $path_log_docker_networks | \
+        awk '{print"$IPT -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
 fi
 
 ###############################################################################
