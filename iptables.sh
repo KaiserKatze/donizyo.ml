@@ -601,6 +601,21 @@ $IPT -A udp_inbound -p UDP -s 0/0 --destination-port 53 -j ACCEPT
 # connection rules should handle this situation, though.
 # $IPT -A udp_inbound -p UDP -s 0/0 --source-port 53 -j ACCEPT
 
+# User specified allowed UDP protocol
+for port in $enabled_misc_ports;
+do
+    port_protocol=$(netstat -tuan | \
+        awk 'NR>2{print $1 " " $4}' | \
+        awk '/0\.0\.0\.0/{print $1 ":" $2}' | \
+        awk -F: '{print $1 " " $3}' | \
+        grep "$port" | \
+        awk '{print $1}')
+    if [ "$port_protocol" == "udp" ];
+    then
+        $IPT -A udp_inbound -p UDP -s 0/0 --destination-port $port -j ACCEPT
+    fi
+done
+
 
 # Not matched, so return for logging
 $IPT -A udp_inbound -p UDP -j RETURN
@@ -640,6 +655,22 @@ $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 443 -j ACCEPT
 
 # sshd
 $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j ACCEPT
+
+# User specified allowed TCP protocol
+for port in $enabled_misc_ports;
+do
+    port_protocol=$(netstat -tuan | \
+        awk 'NR>2{print $1 " " $4}' | \
+        awk '/0\.0\.0\.0/{print $1 ":" $2}' | \
+        awk -F: '{print $1 " " $3}' | \
+        grep "$port" | \
+        awk '{print $1}')
+    if [ "$port_protocol" == "tcp" ];
+    then
+        $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
+    fi
+done
+
 
 
 # Not matched, so return so it will be logged
