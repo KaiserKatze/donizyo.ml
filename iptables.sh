@@ -119,9 +119,9 @@ then
         awk 'NR>2{gsub("LISTEN", "");print $1 "\t" $4 "\t" $6}' | \
         sed '/0\.0\.0\.0/!d' | \
         awk '{gsub("0.0.0.0:","");gsub("[0-9]+/","",$3);print $2 "\t" $1 "\t" $3}' | \
-        sed -e /^$PORT_SSH\b/d \
-            -e /^80\b/d \
-            -e /^443\b/d
+        sed -e /^$PORT_SSH\\b/d \
+            -e /^80\\b/d \
+            -e /^443\\b/d
     read -p "Please input port number(s) to allow inbound/outbound tcp/udp packets through: " enabled_misc_ports
 fi
 
