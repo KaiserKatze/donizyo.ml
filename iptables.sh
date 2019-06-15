@@ -326,6 +326,8 @@ IS_DOCKER_INSTALLED=$(which docker)
 if [ -n "$IS_DOCKER_INSTALLED" ];
 then
 
+    echo "Docker is installed on this system. The firewall would be tempered correspondingly."
+
     # by default, `$iface_iprange_bridge` should be '172.17.0.0/16'
     # and `$iface_name_bridge` should be 'docker0'
     # hereby we replace it with variable just in case docker or user changes it
@@ -782,16 +784,19 @@ then
         "$IPT -A FORWARD -i "$1" ! -o "$1" -j ACCEPT" "\n" \
         "$IPT -A FORWARD -i "$1" -o "$1" -j ACCEPT"}' | bash
 
+    # packets destined to docker gateways,
+    # but not originated from them,
+    # goes to chain DOCKER-ISOLATION-STAGE-2
     #$IPT -A DOCKER-ISOLATION-STAGE-1 -i docker0 ! -o docker0 -j DOCKER-ISOLATION-STAGE-2
     $IPT -A DOCKER-ISOLATION-STAGE-1 -i $iface_name_bridge ! -o $iface_name_bridge -j DOCKER-ISOLATION-STAGE-2
-
     cat $path_log_docker_networks | awk '{print \
         "$IPT -A DOCKER-ISOLATION-STAGE-1 -i "$1" ! -o "$1" -j DOCKER-ISOLATION-STAGE-2"}' | bash
 
     $IPT -A DOCKER-ISOLATION-STAGE-1 -j RETURN
+
+    # packets originated from docker gateways will be dropped
     #$IPT -A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
     $IPT -A DOCKER-ISOLATION-STAGE-2 -o $iface_name_bridge -j DROP
-
     cat $path_log_docker_networks | awk '{print \
         "$IPT -A DOCKER-ISOLATION-STAGE-2 -o "$1" -j DROP"}' | bash
 
@@ -845,15 +850,20 @@ then
     $IPT -t nat -N DOCKER
 
     # PREROUTING chain
+
+    # all incoming packets destined to local address(es) will be directed to chain DOCKER
     # `LOCAL` refers to any address assigned to an interface
     # try `ip addr show | awk '/inet/{print $2}' | cut -d'/' -f1`
     $IPT -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
 
     # OUTPUT chain
+
+    # all locally-generated packets destined to local address(es) will be directed to chain DOCKER
     $IPT -t nat -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
 
     # POSTROUTING chain
 
+    # all packets from internal address(es) behind gateway `docker0` presumably will be masqueraded
     #$IPT -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
     $IPT -t nat -A POSTROUTING -s $iface_iprange_bridge ! -o $iface_name_bridge -j MASQUERADE
 
@@ -861,12 +871,15 @@ then
 
     list_docker_networks
 
+    # all packets from internal address(es) behind gateway of user-defined network will be masqueraded
     cat $path_log_docker_networks | \
         awk '{print"$IPT -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
 
+    # all packets coming in through interface `docker0` presumably will be accepted
     #$IPT -t nat -A DOCKER -i docker0 -j RETURN
     $IPT -t nat -A DOCKER -i $iface_name_bridge -j RETURN
 
+    # all packets coming in through interface of user-defined network will be accepted
     cat $path_log_docker_networks | \
         awk '{print"$IPT -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
 fi
