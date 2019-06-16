@@ -691,7 +691,7 @@ $IPT -A tcp_outbound -p TCP -s 0/0 -j ACCEPT
 # User specified allowed TCP/UDP protocol
 for port in $enabled_misc_ports;
 do
-    if echo "$port" | grep -P '^\d+(/((tcp)|(udp)))?$';
+    if echo "$port" | grep -P '^\d+(/((tcp)|(udp)))?$' > /dev/null;
     then
         # valid port spec string
         protocol=$(echo $port | cut -d'/' -f2)
