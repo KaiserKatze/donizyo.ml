@@ -630,21 +630,6 @@ $IPT -A udp_inbound -p UDP -s 0/0 --destination-port 53 -j ACCEPT
 # User specified allowed UDP protocol
 $IPT -A udp_inbound -p UDP -s 0/0 -j userspec_udp_inbound
 
-for port in $enabled_misc_ports;
-do
-    port_protocol=$(netstat -tuan | \
-        awk 'NR>2{print $1 " " $4}' | \
-        awk '/0\.0\.0\.0/{print $1 ":" $2}' | \
-        awk -F: '{print $1 " " $3}' | \
-        grep "$port" | \
-        awk '{print $1}')
-    if [ "$port_protocol" == "udp" ];
-    then
-        $IPT -A userspec_udp_inbound --destination-port $port -j ACCEPT
-    fi
-done
-
-
 # Not matched, so return for logging
 $IPT -A udp_inbound -p UDP -j RETURN
 
@@ -689,22 +674,6 @@ $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j ACCEPT
 # User specified allowed TCP protocol
 $IPT -A tcp_inbound -p TCP -s 0/0 -j userspec_tcp_inbound
 
-for port in $enabled_misc_ports;
-do
-    port_protocol=$(netstat -tuan | \
-        awk 'NR>2{print $1 " " $4}' | \
-        awk '/0\.0\.0\.0/{print $1 ":" $2}' | \
-        awk -F: '{print $1 " " $3}' | \
-        grep "$port" | \
-        awk '{print $1}')
-    if [ "$port_protocol" == "tcp" ];
-    then
-        $IPT -A userspec_tcp_inbound --destination-port $port -j ACCEPT
-    fi
-done
-
-
-
 # Not matched, so return so it will be logged
 $IPT -A tcp_inbound -p TCP -j RETURN
 
@@ -717,6 +686,32 @@ $IPT -A tcp_inbound -p TCP -j RETURN
 
 # No match, so ACCEPT
 $IPT -A tcp_outbound -p TCP -s 0/0 -j ACCEPT
+
+
+# User specified allowed TCP/UDP protocol
+for port in $enabled_misc_ports;
+do
+    if echo "$port" | grep -P '^\d+(/((tcp)|(udp)))?$';
+    then
+        # valid port spec string
+        protocol=$(echo $port | cut -d'/' -f2)
+        port=$(echo $port | cut -d'/' -f1)
+        if [ "$protocol" == "tcp" ];
+            $IPT -A userspec_tcp_inbound --destination-port $port -j ACCEPT
+        elif [ "$protocol" == "udp" ];
+            $IPT -A userspec_udp_inbound --destination-port $port -j ACCEPT
+        else
+            $IPT -A userspec_udp_inbound --destination-port $port -j ACCEPT
+            $IPT -A userspec_tcp_inbound --destination-port $port -j ACCEPT
+        fi
+    else
+        # invalid port spec string
+        printerr "Invalid port spec string ($port)!"
+    fi
+done
+
+$IPT -A userspec_udp_inbound -j RETURN
+$IPT -A userspec_tcp_inbound -j RETURN
 
 ###############################################################################
 #
