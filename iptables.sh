@@ -696,9 +696,9 @@ do
         # valid port spec string
         protocol=$(echo $port | cut -d'/' -f2)
         port=$(echo $port | cut -d'/' -f1)
-        if [ "$protocol" == "tcp" ];
+        if [ "$protocol" == "tcp" ]; then
             $IPT -A userspec_tcp_inbound --destination-port $port -j ACCEPT
-        elif [ "$protocol" == "udp" ];
+        elif [ "$protocol" == "udp" ]; then
             $IPT -A userspec_udp_inbound --destination-port $port -j ACCEPT
         else
             $IPT -A userspec_udp_inbound --destination-port $port -j ACCEPT
