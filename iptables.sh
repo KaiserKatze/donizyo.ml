@@ -350,35 +350,36 @@ then
         ip addr show | grep $iface_name_bridge || exit 1
     fi
 
+    list_docker_networks() {
+        dir_log_docker_networks=/tmp/docker
+        path_log_docker_networks=$dir_log_docker_networks/networks.txt
+        mkdir -p $dir_log_docker_networks
+        rm -f $path_log_docker_networks
+        touch $path_log_docker_networks
+
+        # list all user-defined networks for docker
+        networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
+        if [ -n "$networks" ];
+        then
+            for network in $networks;
+            do
+                network_id=$(docker network inspect $network | awk '/"Id"/{print $2}' | cut -d'"' -f2)
+                if [ -n "$network_id" ];
+                then
+                    network_short_id=${network_id:0:12}
+                    iface_name="br-"$network_short_id
+                    iface_iprange=$(docker network inspect $network | awk '/Subnet/{print $2}' | cut -d'"' -f2)
+
+                    echo "$iface_name $iface_iprange" >> $path_log_docker_networks
+                else
+                    printerr "Exception: Docker network ID too short ($network_id)!"
+                fi
+            done
+        fi
+    }
+
+    list_docker_networks
 fi
-
-list_docker_networks() {
-    dir_log_docker_networks=/tmp/docker
-    path_log_docker_networks=$dir_log_docker_networks/networks.txt
-    mkdir -p $dir_log_docker_networks
-    rm -f $path_log_docker_networks
-    touch $path_log_docker_networks
-
-    # list all user-defined networks for docker
-    networks=$(docker network ls | awk 'NR>1{print $2}' | sed -e '/bridge/d' -e '/host/d' -e '/none/d')
-    if [ -n "$networks" ];
-    then
-        for network in $networks;
-        do
-            network_id=$(docker network inspect $network | awk '/"Id"/{print $2}' | cut -d'"' -f2)
-            if [ -n "$network_id" ];
-            then
-                network_short_id=${network_id:0:12}
-                iface_name="br-"$network_short_id
-                iface_iprange=$(docker network inspect $network | awk '/Subnet/{print $2}' | cut -d'"' -f2)
-
-                echo "$iface_name $iface_iprange" >> $path_log_docker_networks
-            else
-                printerr "Exception: Docker network ID too short ($network_id)!"
-            fi
-        done
-    fi
-}
 
 ###############################################################################
 #
@@ -792,8 +793,6 @@ then
     #$IPT -A FORWARD -i docker0 -o docker0 -j ACCEPT
     $IPT -A FORWARD -i $iface_name_bridge -o $iface_name_bridge -j ACCEPT
 
-    list_docker_networks
-
     cat $path_log_docker_networks | awk -v run_ipt="$IPT" '{print \
         run_ipt " -A FORWARD -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT" "\n" \
         run_ipt " -A FORWARD -o "$1" -j DOCKER" "\n" \
@@ -817,6 +816,32 @@ then
         run_ipt " -A DOCKER-ISOLATION-STAGE-2 -o "$1" -j DROP"}' | bash
 
     $IPT -A DOCKER-ISOLATION-STAGE-2 -j RETURN
+
+    # block inbound packets destined to ports of containers that is not exposed
+
+    # running containers not connected to network `none`
+    dp_none=$(docker ps -aq -f status=running -f network=none)
+    # all running containers
+    dp_all=$(docker ps -aq -f status=running)
+
+    # filter running containers with network enabled
+    for container in $dp_none;
+    do
+        dp_all=$(printf "%s\n" $dp_all | sed "/^$container$/d")
+    done
+
+    # get exposed ports
+    for container in $dp_all;
+    do
+        docker port $container | \
+            cut -d' ' -f3 | \
+            sed '/^127\.0\.0\.1:/!d' | \
+            awk '{gsub("127.0.0.1:",""); \
+                print}'
+    done
+
+    $IPT -A DOCKER-USER -j DROP
+
     $IPT -A DOCKER-USER -j RETURN
 fi
 
@@ -891,8 +916,6 @@ then
     $IPT -t nat -A POSTROUTING -s $iface_iprange_bridge ! -o $iface_name_bridge -j MASQUERADE
 
     # Docker networks
-
-    list_docker_networks
 
     # all packets from internal address(es) behind gateway of user-defined network will be masqueraded
     cat $path_log_docker_networks | \
