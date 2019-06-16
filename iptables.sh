@@ -474,9 +474,15 @@ $IPT -N udp_outbound
 # Default fail except for established sessions
 $IPT -N tcp_inbound
 
+# User specified TCP inbound rules
+$IPT -N userspec_tcp_inbound
+
 # Used to block outbound services from internal network
 # Default to allow all
 $IPT -N tcp_outbound
+
+# User specified UDP inbound rules
+$IPT -N userspec_udp_inbound
 
 ###############################################################################
 #
@@ -622,6 +628,8 @@ $IPT -A udp_inbound -p UDP -s 0/0 --destination-port 53 -j ACCEPT
 # $IPT -A udp_inbound -p UDP -s 0/0 --source-port 53 -j ACCEPT
 
 # User specified allowed UDP protocol
+$IPT -A udp_inbound -p UDP -s 0/0 -j userspec_udp_inbound
+
 for port in $enabled_misc_ports;
 do
     port_protocol=$(netstat -tuan | \
@@ -632,7 +640,7 @@ do
         awk '{print $1}')
     if [ "$port_protocol" == "udp" ];
     then
-        $IPT -A udp_inbound -p UDP -s 0/0 --destination-port $port -j ACCEPT
+        $IPT -A userspec_udp_inbound --destination-port $port -j ACCEPT
     fi
 done
 
@@ -679,6 +687,8 @@ $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j LOG \
 $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j ACCEPT
 
 # User specified allowed TCP protocol
+$IPT -A tcp_inbound -p TCP -s 0/0 -j userspec_tcp_inbound
+
 for port in $enabled_misc_ports;
 do
     port_protocol=$(netstat -tuan | \
@@ -689,7 +699,7 @@ do
         awk '{print $1}')
     if [ "$port_protocol" == "tcp" ];
     then
-        $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
+        $IPT -A userspec_tcp_inbound --destination-port $port -j ACCEPT
     fi
 done
 
