@@ -697,12 +697,12 @@ do
         protocol=$(echo $port | cut -d'/' -f2)
         port=$(echo $port | cut -d'/' -f1)
         if [ "$protocol" == "tcp" ]; then
-            $IPT -A userspec_tcp_inbound --destination-port $port -j ACCEPT
+            $IPT -A userspec_tcp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
         elif [ "$protocol" == "udp" ]; then
-            $IPT -A userspec_udp_inbound --destination-port $port -j ACCEPT
+            $IPT -A userspec_udp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
         else
-            $IPT -A userspec_udp_inbound --destination-port $port -j ACCEPT
-            $IPT -A userspec_tcp_inbound --destination-port $port -j ACCEPT
+            $IPT -A userspec_udp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
+            $IPT -A userspec_tcp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
         fi
     else
         # invalid port spec string
