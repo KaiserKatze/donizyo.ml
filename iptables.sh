@@ -612,14 +612,14 @@ $IPT -A icmp_packets -p ICMP -j RETURN
 # quickly and without logging them.  This prevents them from traversing
 # the whole chain and keeps the log from getting cluttered with
 # chatter from Windows systems.
-$IPT -A udp_inbound -p UDP -s 0/0 --destination-port 137 -j DROP
-$IPT -A udp_inbound -p UDP -s 0/0 --destination-port 138 -j DROP
+$IPT -A udp_inbound -p UDP -s 0/0 --dport 137 -j DROP
+$IPT -A udp_inbound -p UDP -s 0/0 --dport 138 -j DROP
 
 # DNS Server
 # Configure the server to use port 53 as the source port for requests
 # Note, if you run a caching-only name server that only accepts queries
 # from the private network or localhost, you can comment out this line.
-$IPT -A udp_inbound -p UDP -s 0/0 --destination-port 53 -j ACCEPT
+$IPT -A udp_inbound -p UDP -s 0/0 --dport 53 -j ACCEPT
 
 # If you don't query-source the server to port 53 and you have problems,
 # uncomment this rule.  It specifically allows responses to queries
@@ -656,20 +656,20 @@ $IPT -A udp_outbound -p UDP -s 0/0 -j ACCEPT
 # DNS queries use UDP by default, a truncated UDP query can legally be
 # submitted via TCP instead.  You probably will never need it, but should
 # be aware of the fact.
-# $IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 53 -j ACCEPT
+# $IPT -A tcp_inbound -p TCP -s 0/0 --dport 53 -j ACCEPT
 
 # Web Server
 
 # HTTP
-$IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 80 -j ACCEPT
+$IPT -A tcp_inbound -p TCP -s 0/0 --dport 80 -j ACCEPT
 
 # HTTPS (Secure Web Server)
-$IPT -A tcp_inbound -p TCP -s 0/0 --destination-port 443 -j ACCEPT
+$IPT -A tcp_inbound -p TCP -s 0/0 --dport 443 -j ACCEPT
 
 # sshd
-$IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j LOG \
+$IPT -A tcp_inbound -p TCP -s 0/0 --dport $PORT_SSH -j LOG \
     --log-prefix "fp=ssh:1 a=ACCEPT "
-$IPT -A tcp_inbound -p TCP -s 0/0 --destination-port $PORT_SSH -j ACCEPT
+$IPT -A tcp_inbound -p TCP -s 0/0 --dport $PORT_SSH -j ACCEPT
 
 # User specified allowed TCP protocol
 $IPT -A tcp_inbound -p TCP -s 0/0 -j userspec_tcp_inbound
@@ -697,12 +697,12 @@ do
         protocol=$(echo $port | cut -d'/' -f2)
         port=$(echo $port | cut -d'/' -f1)
         if [ "$protocol" == "tcp" ]; then
-            $IPT -A userspec_tcp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
+            $IPT -A userspec_tcp_inbound -p TCP -s 0/0 --dport $port -j ACCEPT
         elif [ "$protocol" == "udp" ]; then
-            $IPT -A userspec_udp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
+            $IPT -A userspec_udp_inbound -p TCP -s 0/0 --dport $port -j ACCEPT
         else
-            $IPT -A userspec_udp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
-            $IPT -A userspec_tcp_inbound -p TCP -s 0/0 --destination-port $port -j ACCEPT
+            $IPT -A userspec_udp_inbound -p TCP -s 0/0 --dport $port -j ACCEPT
+            $IPT -A userspec_tcp_inbound -p TCP -s 0/0 --dport $port -j ACCEPT
         fi
     else
         # invalid port spec string
