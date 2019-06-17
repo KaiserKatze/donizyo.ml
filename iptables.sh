@@ -1018,6 +1018,23 @@ then
     cat $path_log_docker_networks | \
         awk -v run_ipt="$IPT" '{print \
             run_ipt " -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
+
+    # TODO
+    #$IPT -t nat -A DOCKER -d 127.0.0.1/32 ! -i docker0 -p tcp -m tcp --dport 80 -j DNAT --to-destination 172.17.0.2:80
+    for container in $dp_all;
+    do
+        # i'm done with considering one-container-multiple-networks architecture
+        # now i'll only take one line from each file as follows
+        seg1=$(cat $dir_log_docker/container-network.txt | \
+            grep "^$container:" | \
+            awk 'NR==1' | \
+            awk '{print "-t nat -A DOCKER -d 127.0.0.1/32 ! -i "$3" | -j DNAT --to-destination "$5":"}')
+        seg2=$(cat $dir_log_docker/container-port.txt | \
+            grep "^$container:" | \
+            awk 'NR==1' | \
+            awk '{print "-p "$3" -m "$3" --dport "$2"|"$2}')
+        echo $IPT $(echo $seg1 | cut -d'|' -f1)$(echo $seg2 | cut -d'|' -f1)$(echo $seg1 | cut -d'|' -f2)$(echo $seg2 | cut -d'|' -f2) | bash
+    done
 fi
 
 ###############################################################################
