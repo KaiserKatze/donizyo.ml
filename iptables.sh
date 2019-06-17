@@ -994,7 +994,7 @@ then
             run_ipt " -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
 
     # TODO
-    #$IPT -A POSTROUTING -s 172.17.0.2/32 -d 172.17.0.2/32 -p tcp -m tcp --dport 80 -j MASQUERADE
+    #$IPT -t nat -A POSTROUTING -s 172.17.0.2/32 -d 172.17.0.2/32 -p tcp -m tcp --dport 80 -j MASQUERADE
     for container in $dp_all;
     do
         # i'm done with considering one-container-multiple-networks architecture
@@ -1002,7 +1002,7 @@ then
         seg1=$(cat $dir_log_docker/container-network.txt | \
             grep "^$container:" | \
             awk 'NR==1' | \
-            awk '{print " -A POSTROUTING -s "$5"/32 -d "$5"/32"}')
+            awk '{print " -t nat -A POSTROUTING -s "$5"/32 -d "$5"/32"}')
         seg2=$(cat $dir_log_docker/container-port.txt | \
             grep "^$container:" | \
             awk 'NR==1' | \
