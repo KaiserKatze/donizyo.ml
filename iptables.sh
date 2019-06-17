@@ -109,9 +109,14 @@ if [ -f "$path_sshd_config" ];
 then
     sshd_listen_addr=$(cat $path_sshd_config | awk '/^\s*ListenAddress/{print $2}')
     sshd_default_port=$(cat $path_sshd_config | awk '/^\s*Port/{print $2}')
-    sshd_ext_if_port=$(echo $sshd_listen_addr | grep -Po "$INET_ADDRESS:\K\d+")
-    sshd_all_if_port=$(echo $sshd_listen_addr | grep -Po '0\.0\.0\.0:\K\d+')
-    PORT_SSH=$sshd_ext_if_port
+    if [ -n "$sshd_listen_addr" ];
+    then
+        sshd_ext_if_port=$(echo $sshd_listen_addr | grep -Po "$INET_ADDRESS:\K\d+")
+        sshd_all_if_port=$(echo $sshd_listen_addr | grep -Po '0\.0\.0\.0:\K\d+')
+        PORT_SSH=$sshd_ext_if_port
+    else
+        PORT_SSH=
+    fi
     if [ -z "$PORT_SSH" ]; then PORT_SSH=$sshd_all_if_port; fi
     if [ -z "$PORT_SSH" ]; then PORT_SSH=$sshd_default_port; fi
     if [ -z "$PORT_SSH" ]; then PORT_SSH=22; fi
