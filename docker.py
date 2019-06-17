@@ -31,9 +31,12 @@ class Container:
         networks = network_settings["Networks"]
 
         for network_name, network_config in networks.items():
-            network_id = network_config["NetworkID"]
-            network_short_id = network_id[:12]
-            iface_name = "br-{}".format(network_short_id)
+            if network_name == "bridge":
+                iface_name = "docker0"
+            else:
+                network_id = network_config["NetworkID"]
+                network_short_id = network_id[:12]
+                iface_name = "br-{}".format(network_short_id)
             gateway_ip = network_config["Gateway"]
             container_ip = network_config["IPAddress"]
 
