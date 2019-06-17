@@ -40,6 +40,14 @@
 #    the last thing executed on startup.  Simply add /path/to/script/script_name
 #    on its own line in the rc.local file.
 
+set -Ee
+failure() {
+  local lineno=$1
+  local msg=$2
+  echo "Failed at $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+
 ###############################################################################
 #
 # Local Settings
