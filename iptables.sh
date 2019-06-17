@@ -47,6 +47,11 @@ failure() {
     echo -e "\e[91mFailed\e[0m at $lineno: $msg"
 }
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+trybash() {
+    command=$(cat -)
+    echo -e "\e[93mTrying to execute:\e[0m\n$command"
+    echo "$command" | bash
+}
 
 ###############################################################################
 #
@@ -822,7 +827,7 @@ $IPT -A INPUT -j LOG --log-prefix "fp=INPUT:99 a=DROP "
 #    # to chain `docker_container_input`
 #    $IPT -A INPUT -i $iface_name_bridge -j docker_container_input
 #    cat $path_log_docker_networks | awk -v run_ipt="$IPT" '{print \
-#        run_ipt " -A INPUT -i "$1" -j docker_container_input"}' | bash
+#        run_ipt " -A INPUT -i "$1" -j docker_container_input"}' | trybash
 #
 #    # running containers not connected to network `none`
 #    dp_none=$(docker ps -aq -f status=running -f network=none)
@@ -886,7 +891,7 @@ then
         run_ipt " -A FORWARD -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT" "\n" \
         run_ipt " -A FORWARD -o "$1" -j DOCKER" "\n" \
         run_ipt " -A FORWARD -i "$1" ! -o "$1" -j ACCEPT" "\n" \
-        run_ipt " -A FORWARD -i "$1" -o "$1" -j ACCEPT"}' | bash
+        run_ipt " -A FORWARD -i "$1" -o "$1" -j ACCEPT"}' | trybash
 
     # allow packets according to the ports exposed by each container
     # TODO
@@ -903,7 +908,7 @@ then
             grep "^$container:" | \
             awk 'NR==1' | \
             awk '{print " -p "$3" -m "$3" --dport "$2" -j ACCEPT"}')
-        echo "$IPT$seg1$seg2" | bash
+        echo "$IPT$seg1$seg2" | trybash
     done
 
     # packets destined to docker gateways,
@@ -912,7 +917,7 @@ then
     #$IPT -A DOCKER-ISOLATION-STAGE-1 -i docker0 ! -o docker0 -j DOCKER-ISOLATION-STAGE-2
     $IPT -A DOCKER-ISOLATION-STAGE-1 -i $iface_name_bridge ! -o $iface_name_bridge -j DOCKER-ISOLATION-STAGE-2
     cat $path_log_docker_networks | awk -v run_ipt="$IPT" '{print \
-        run_ipt " -A DOCKER-ISOLATION-STAGE-1 -i "$1" ! -o "$1" -j DOCKER-ISOLATION-STAGE-2"}' | bash
+        run_ipt " -A DOCKER-ISOLATION-STAGE-1 -i "$1" ! -o "$1" -j DOCKER-ISOLATION-STAGE-2"}' | trybash
 
     $IPT -A DOCKER-ISOLATION-STAGE-1 -j RETURN
 
@@ -920,7 +925,7 @@ then
     #$IPT -A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
     $IPT -A DOCKER-ISOLATION-STAGE-2 -o $iface_name_bridge -j DROP
     cat $path_log_docker_networks | awk -v run_ipt="$IPT" '{print \
-        run_ipt " -A DOCKER-ISOLATION-STAGE-2 -o "$1" -j DROP"}' | bash
+        run_ipt " -A DOCKER-ISOLATION-STAGE-2 -o "$1" -j DROP"}' | trybash
 
     $IPT -A DOCKER-ISOLATION-STAGE-2 -j RETURN
 
@@ -1004,7 +1009,7 @@ then
         awk -v run_ipt="$IPT" '{print \
             run_ipt " -t nat -A POSTROUTING -s "$2" ! -o "$1" -j LOG \
                 --log-prefix \"fp=NAT:DOCKER:4 a=MASQUERADE \"" "\n" \
-            run_ipt " -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | bash
+            run_ipt " -t nat -A POSTROUTING -s "$2" ! -o "$1" -j MASQUERADE"}' | trybash
 
     # TODO
     #$IPT -t nat -A POSTROUTING -s 172.17.0.2/32 -d 172.17.0.2/32 -p tcp -m tcp --dport 80 -j MASQUERADE
@@ -1020,7 +1025,7 @@ then
             grep "^$container:" | \
             awk 'NR==1' | \
             awk '{print " -p "$3" -m "$3" --dport "$2" -j MASQUERADE"}')
-        echo $IPT$seg1$seg2 | bash
+        echo $IPT$seg1$seg2 | trybash
     done
 
     # all packets coming in through interface `docker0` presumably will be accepted
@@ -1030,7 +1035,7 @@ then
     # all packets coming in through interface of user-defined network will be accepted
     cat $path_log_docker_networks | \
         awk -v run_ipt="$IPT" '{print \
-            run_ipt " -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
+            run_ipt " -t nat -A DOCKER -i "$1" -j RETURN"}' | trybash
 
     # TODO
     #$IPT -t nat -A DOCKER -d 127.0.0.1/32 ! -i docker0 -p tcp -m tcp --dport 80 -j DNAT --to-destination 172.17.0.2:80
@@ -1046,7 +1051,7 @@ then
             grep "^$container:" | \
             awk 'NR==1' | \
             awk '{print "-p "$3" -m "$3" --dport "$2"|"$2}')
-        echo "$IPT $(echo $seg1 | cut -d'|' -f1)$(echo $seg2 | cut -d'|' -f1)$(echo $seg1 | cut -d'|' -f2)$(echo $seg2 | cut -d'|' -f2)" | bash
+        echo "$IPT $(echo $seg1 | cut -d'|' -f1)$(echo $seg2 | cut -d'|' -f1)$(echo $seg1 | cut -d'|' -f2)$(echo $seg2 | cut -d'|' -f2)" | trybash
     done
 fi
 
