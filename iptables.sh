@@ -903,7 +903,7 @@ then
             grep "^$container:" | \
             awk 'NR==1' | \
             awk '{print " -p "$3" -m "$3" --dport "$2" -j ACCEPT"}')
-        echo $IPT$seg1$seg2 | bash
+        echo "$IPT$seg1$seg2" | bash
     done
 
     # packets destined to docker gateways,
@@ -1046,7 +1046,7 @@ then
             grep "^$container:" | \
             awk 'NR==1' | \
             awk '{print "-p "$3" -m "$3" --dport "$2"|"$2}')
-        echo $IPT $(echo $seg1 | cut -d'|' -f1)$(echo $seg2 | cut -d'|' -f1)$(echo $seg1 | cut -d'|' -f2)$(echo $seg2 | cut -d'|' -f2) | bash
+        echo "$IPT $(echo $seg1 | cut -d'|' -f1)$(echo $seg2 | cut -d'|' -f1)$(echo $seg1 | cut -d'|' -f2)$(echo $seg2 | cut -d'|' -f2)" | bash
     done
 fi
 
