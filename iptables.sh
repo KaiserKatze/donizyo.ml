@@ -42,10 +42,12 @@
 
 set -Ee
 failure() {
-  local lineno=$1
-  local msg=$2
-  echo -e "\e[91mFailed\e[0m at $lineno: $msg"
+    local lineno=$1
+    local msg=$2
+    echo -e "\e[91mFailed\e[0m at $lineno: $msg\n" \
+        "$previous_command"
 }
+trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 
 ###############################################################################
