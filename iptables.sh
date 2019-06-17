@@ -875,6 +875,24 @@ then
         run_ipt " -A FORWARD -i "$1" ! -o "$1" -j ACCEPT" "\n" \
         run_ipt " -A FORWARD -i "$1" -o "$1" -j ACCEPT"}' | bash
 
+    # allow packets according to the ports exposed by each container
+    # TODO
+    #$IPT -A DOCKER -d 172.17.0.2/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport 80 -j ACCEPT
+    for container in $dp_all;
+    do
+        # i'm done with considering one-container-multiple-networks architecture
+        # now i'll only take one line from each file as follows
+        seg1=$(cat $dir_log_docker/container-network.txt | \
+            grep "^$container:" | \
+            awk 'NR==1' | \
+            awk '{print " -A DOCKER -d "$5"/32 ! -i "$3" -o "$3}')
+        seg2=$(cat $dir_log_docker/container-port.txt | \
+            grep "^$container:" | \
+            awk 'NR==1' | \
+            awk '{print " -p "$3" -m "$3" --dport "$2" -j ACCEPT"}')
+        echo $IPT$seg1$seg2 | bash
+    done
+
     # packets destined to docker gateways,
     # but not originated from them,
     # goes to chain DOCKER-ISOLATION-STAGE-2
