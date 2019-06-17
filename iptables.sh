@@ -766,47 +766,47 @@ $IPT -A INPUT -j LOG --log-prefix "fp=INPUT:99 a=DROP "
 
 
 # Docker
-if [ -n "$IS_DOCKER_INSTALLED" ];
-then
-    # block inbound packets destined to ports of containers that is not exposed
-
-    $IPT -N docker_container_input
-
-    # redirect all packets from default bridge
-    # and user-specified network gateway
-    # to chain `docker_container_input`
-    $IPT -A INPUT -i $iface_name_bridge -j docker_container_input
-    cat $path_log_docker_networks | awk -v run_ipt="$IPT" '{print \
-        run_ipt " -A INPUT -i "$1" -j docker_container_input"}' | bash
-
-    # running containers not connected to network `none`
-    dp_none=$(docker ps -aq -f status=running -f network=none)
-    # all running containers
-    dp_all=$(docker ps -aq -f status=running)
-    # filter running containers with network enabled
-    for container in $dp_none;
-    do
-        dp_all=$(printf "%s\n" $dp_all | sed "/^$container$/d")
-    done
-
-    # get exposed ports
-    for container in $dp_all;
-    do
-        # get list of ports exposed by this container
-        docker port $container | \
-            awk '{print $3 " " $1}' | \
-            sed '/^127\.0\.0\.1:/!d' | \
-            awk -v run_ipt="$IPT" '{ \
-                gsub("127.0.0.1:",""); \
-                gsub("[0-9]+/",""); \
-                print run_ipt " -A docker_container_input -p "$2" --dport "$1" -j ACCEPT"}' | \
-            awk '!a[$0]++' | \
-            bash
-    done
-
-    # drop all non-matching packets
-    $IPT -A docker_container_input -j DROP
-fi
+#if [ -n "$IS_DOCKER_INSTALLED" ];
+#then
+#    # block inbound packets destined to ports of containers that is not exposed
+#
+#    $IPT -N docker_container_input
+#
+#    # redirect all packets from default bridge
+#    # and user-specified network gateway
+#    # to chain `docker_container_input`
+#    $IPT -A INPUT -i $iface_name_bridge -j docker_container_input
+#    cat $path_log_docker_networks | awk -v run_ipt="$IPT" '{print \
+#        run_ipt " -A INPUT -i "$1" -j docker_container_input"}' | bash
+#
+#    # running containers not connected to network `none`
+#    dp_none=$(docker ps -aq -f status=running -f network=none)
+#    # all running containers
+#    dp_all=$(docker ps -aq -f status=running)
+#    # filter running containers with network enabled
+#    for container in $dp_none;
+#    do
+#        dp_all=$(printf "%s\n" $dp_all | sed "/^$container$/d")
+#    done
+#
+#    # get exposed ports
+#    for container in $dp_all;
+#    do
+#        # get list of ports exposed by this container
+#        docker port $container | \
+#            awk '{print $3 " " $1}' | \
+#            sed '/^127\.0\.0\.1:/!d' | \
+#            awk -v run_ipt="$IPT" '{ \
+#                gsub("127.0.0.1:",""); \
+#                gsub("[0-9]+/",""); \
+#                print run_ipt " -A docker_container_input -p "$2" --dport "$1" -j ACCEPT"}' | \
+#            awk '!a[$0]++' | \
+#            bash
+#    done
+#
+#    # drop all non-matching packets
+#    $IPT -A docker_container_input -j DROP
+#fi
 
 ###############################################################################
 #
@@ -949,7 +949,8 @@ then
 
     # all packets coming in through interface of user-defined network will be accepted
     cat $path_log_docker_networks | \
-        awk -v run_ipt="$IPT" '{printrun_ipt " -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
+        awk -v run_ipt="$IPT" '{print \
+            run_ipt " -t nat -A DOCKER -i "$1" -j RETURN"}' | bash
 fi
 
 ###############################################################################
