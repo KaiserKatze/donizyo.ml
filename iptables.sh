@@ -380,6 +380,37 @@ then
     }
 
     list_docker_networks
+
+    # Running network-active containers:
+    # filter running containers with network enabled
+    # remove 'running containers connected to network `none`'
+    # from 'all running containers'
+    # @see: https://stackoverflow.com/a/10218881/4927212
+    dp_all=$(docker ps -aq -f status=running | sed "$(docker ps -aq -f status=running -f network=none | awk '{printf("-e /^%s$/d ", $1)}')")
+
+    # get exposed ports
+    for container in $dp_all;
+    do
+        # get list of networks this container connects
+        python docker.py container networks $container | \
+            awk -v container="$container" \
+                '{print container ": " $0}' > $dir_log_docker/container-network.txt
+        # result would look like this:
+        # c52c7c5aba21 bridge docker0 172.17.0.1 172.17.0.2
+
+        # get list of ports exposed by this container
+        docker port $container | \
+            awk '{print $3 " " $1}' | \
+            sed '/^127\.0\.0\.1:/!d' | \
+            awk '{gsub("127.0.0.1:",""); \
+                gsub("[0-9]+/",""); \
+                print}' | \
+            awk '!a[$0]++' | \
+            awk -v container="$container" \
+                '{print container ": " $0}' > $dir_log_docker/container-port.txt
+        # result would look like this:
+        # c52c7c5aba21 80 tcp
+    done
 fi
 
 ###############################################################################
