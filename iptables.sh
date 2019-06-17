@@ -44,7 +44,7 @@ set -Ee
 failure() {
   local lineno=$1
   local msg=$2
-  echo "Failed at $lineno: $msg"
+  echo -e "\e[91mFailed\e[0m at $lineno: $msg"
 }
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 
