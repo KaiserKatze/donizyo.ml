@@ -350,10 +350,11 @@ then
         ip addr show | grep $iface_name_bridge || exit 1
     fi
 
+    dir_log_docker=/tmp/docker
+    mkdir -p $dir_log_docker
+
     list_docker_networks() {
-        dir_log_docker_networks=/tmp/docker
-        path_log_docker_networks=$dir_log_docker_networks/networks.txt
-        mkdir -p $dir_log_docker_networks
+        path_log_docker_networks=$dir_log_docker/networks.txt
         rm -f $path_log_docker_networks
         touch $path_log_docker_networks
 
