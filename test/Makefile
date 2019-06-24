@@ -1,7 +1,7 @@
 dockerfile=test-firewall.dockerfile
 image_name=test-firewall
 container_name=my-test-firewall
-port_forward_src=8080
+port_forward_src=18080
 port_forward_dst=127.0.0.1:${port_forward_src}
 port_forward=${port_forward_dst}:${port_forward_src}
 
