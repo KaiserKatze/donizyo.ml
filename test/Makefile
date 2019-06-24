@@ -10,7 +10,7 @@ build: preprocess
 	docker build -t ${image_name} -f ${dockerfile} .
 
 preprocess:
-	sed -i "s/EXPOSE      8080/EXPOSE      ${port_forward_src}/g" test-firewall.dockerfile
+	sed -i "s/EXPOSE      8080/EXPOSE      ${port_forward_src}/g" ${dockerfile}
 	sed -i "s/#define PORT_SERVER 8080/#define PORT_SERVER ${port_forward_src}/g" httpecho.c
 
 run:
