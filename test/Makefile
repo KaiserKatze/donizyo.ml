@@ -22,4 +22,6 @@ run: clean build
 	docker run -dit -p ${port_forward} --name ${container_name} ${image_name}
 
 clean:
-	docker rm -f ${container_name}
+	docker rm -f ${container_name} || true
+	docker rmi -f ${docker images -f dangling=true -aq} || true
+	docker images
