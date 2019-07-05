@@ -23,4 +23,3 @@ run: clean build
 
 clean:
 	docker rm -f ${container_name} 2>/dev/null || true
-	docker images
