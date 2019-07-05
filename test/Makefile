@@ -19,7 +19,7 @@ preprocess:
 
 run: clean build
 	@echo "Starting docker container ... "
-	docker run -dit -p ${port_forward} --name ${container_name} ${image_name}
+	docker run -dit -p ${port_forward} --name ${container_name} ${image_name} || true
 
 clean:
 	docker rm -f ${container_name} 2>/dev/null || true
