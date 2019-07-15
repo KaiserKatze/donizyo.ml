@@ -6,6 +6,8 @@ import subprocess
 import argparse
 
 def RunCommand(command):
+    # @see: https://docs.python.org/3/library/subprocess.html#subprocess.run
+    # @see: https://docs.python.org/3/library/subprocess.html#subprocess.CompletedProcess
     result = subprocess.run(command, stdout=subprocess.PIPE)
     return result.returncode, result.stdout
 
