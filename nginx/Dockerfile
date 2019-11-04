@@ -50,13 +50,13 @@ RUN         ./configure --user=www-data --group=www-data \
                 --with-http_stub_status_module \
                 --with-openssl="$PATH_APP/openssl" \
                 --with-pcre="$PATH_APP/pcre" \
-                --with-zlib="$PATH_APP/zlib" \
                 --without-http_gzip_module \
                 --add-module="$PATH_APP/nginx/nginx-rtmp-module"
 RUN         make
 RUN         make install
 
 WORKDIR     /tmp/self/nginx
+# @see: [Difference between “chmod 775” and “chmod 2755”](https://unix.stackexchange.com/questions/52707/difference-between-chmod-775-and-chmod-2755)
 RUN         mkdir -p /etc/nginx && \
             chmod 2755 /etc/nginx && \
             chown root:root /etc/nginx
